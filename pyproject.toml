@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "lookertk"
+name = "lktk"
 version = "0.1.0"
 description = ""
 authors = ["dr666m1 <skndr666m1@gmail.com>"]
