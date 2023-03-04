@@ -9,8 +9,10 @@ arr: "[" [value ("," value)*] "]"
       | dict
       | named_dict
       | ESCAPED_STRING
+COMMENT: /#.*/
 
 %import common.CNAME
 %import common.ESCAPED_STRING
 %import common.WS
 %ignore WS
+%ignore COMMENT

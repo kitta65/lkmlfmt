@@ -10,6 +10,13 @@ import pytest
             """lkml
 """,
         ),
+        # comment
+        (
+            '# this is comment',
+            """lkml
+""",
+        ),
+        # ===== composite termination =====
         # pair
         (
             'project_name: "my project name"',
@@ -94,6 +101,16 @@ import pytest
                 pair
                     key
                     "value"
+""",
+        ),
+        # ===== simple termination =====
+        # string
+        (
+            'key: "value # not comment"',
+            """lkml
+    pair
+        key
+        "value # not comment"
 """,
         ),
     ],
