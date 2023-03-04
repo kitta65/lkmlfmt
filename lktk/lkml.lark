@@ -1,5 +1,6 @@
 lkml: [pair*]
-pair: CNAME ":" value
+pair: CODEBLOCKKEY ":" CODEBLOCK ";;"
+    | CNAME ":" value
 dict: "{" [pair ("," pair)*] "}"
 named_dict: CNAME dict 
 arr: "[" [value ("," value)*] "]"
@@ -10,6 +11,8 @@ arr: "[" [value ("," value)*] "]"
       | named_dict
       | ESCAPED_STRING
 COMMENT: /#.*/
+CODEBLOCK: /\S.*?(?=\s*;;)/
+CODEBLOCKKEY: "expression" | "html" | /sql\w*/
 
 %import common.CNAME
 %import common.ESCAPED_STRING

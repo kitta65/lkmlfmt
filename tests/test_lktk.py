@@ -113,6 +113,26 @@ import pytest
         "value # not comment"
 """,
         ),
+        # codeblock
+        (
+            'expression: #this is code block ;;',
+            """lkml
+    pair
+        expression
+        #this is code block
+""",
+        ),
+        (
+            'sql: code block 1;; sql_xxx: code block 2;;',
+            """lkml
+    pair
+        sql
+        code block 1
+    pair
+        sql_xxx
+        code block 2
+""",
+        ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:
