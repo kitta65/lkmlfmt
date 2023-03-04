@@ -90,13 +90,11 @@ import pytest
             """lkml
     pair
         dictionary
-        dict\tNone
+        dict
 """,
         ),
         (
-            """dictionary: {
-  key: "value"
-}""",
+            """dictionary: {key: "value"}""",
             """lkml
     pair
         dictionary
@@ -104,6 +102,20 @@ import pytest
             pair
                 key
                 "value"
+""",
+        ),
+        (
+            """dictionary: {key1: "value1" key2: "value2"}""",
+            """lkml
+    pair
+        dictionary
+        dict
+            pair
+                key1
+                "value1"
+            pair
+                key2
+                "value2"
 """,
         ),
         # named_dict

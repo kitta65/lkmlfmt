@@ -24,4 +24,4 @@ def run() -> None:
     args = parse_args()
     with open(args.filepath) as f:
         tree = lkml_parser.parse(f.read())
-    tree.pretty()
+    print(tree.pretty())
