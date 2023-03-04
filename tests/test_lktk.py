@@ -21,6 +21,16 @@ import pytest
     yes
 """,
         ),
+        (
+            'exprs: ["expr1", "expr2"]',
+            """lkml
+  pair
+    exprs
+    arr
+      "expr1"
+      "expr2"
+""",
+        ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:
