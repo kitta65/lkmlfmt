@@ -1,0 +1,8 @@
+lkml: pair (NEWLINE pair)*
+pair: CNAME ":" ESCAPED_STRING
+
+%import common.CNAME
+%import common.ESCAPED_STRING
+%import common.NEWLINE
+%import common.WS
+%ignore WS
