@@ -1,9 +1,9 @@
 lkml: pair*
 pair: CODEBLOCKKEY ":" CODEBLOCK ";;"
-    | CNAME ":" value
+    | IDENT ":" value
 dict: "{" pair* "}"
 named_dict: CNAME dict 
-arr: "[" [value ("," value)*] "]"
+arr: "[" [(value | pair) ("," (value | pair))*] "]"
 ?value: arr
       | dict
       | named_dict

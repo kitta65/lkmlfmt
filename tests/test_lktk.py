@@ -84,6 +84,17 @@ import pytest
             "value2"
 """,
         ),
+        (
+            'always_filter: [viewname.fieldname: "condition"]',
+            """lkml
+    pair
+        always_filter
+        arr
+            pair
+                viewname.fieldname
+                "condition"
+""",
+        ),
         # dict
         (
             """dictionary: {}""",
