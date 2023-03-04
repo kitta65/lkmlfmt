@@ -1,5 +1,5 @@
 lkml: pair*
-pair: CODEBLOCKKEY ":" CODEBLOCK ";;"
+pair: CODEBLOCKKEY ":" CODEBLOCK? ";;"
     | IDENT ":" value
 dict: "{" pair* "}"
 named_dict: CNAME dict 
@@ -12,7 +12,8 @@ arr: "[" [(value | pair) ("," (value | pair))*] "]"
       | IDENT
 IDENT: [("+" | "-")] CNAME ("." CNAME)* ["*"]
 COMMENT: /#.*/
-CODEBLOCK: /[^\s;](.|\n)*?(?=\s*;;)/
+// \S is needed cause 0 width regexp is not allowed here
+CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
 CODEBLOCKKEY: "expression" | "html" | /sql\w*/
 
 %import common.CNAME

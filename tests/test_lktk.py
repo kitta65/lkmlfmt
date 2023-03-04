@@ -186,6 +186,12 @@ import pytest
         code block 2
 """,
         ),
+        (
+            "sql:;;",
+            """lkml
+    pair\tsql
+""",
+        ),
         # number
         (
             "num: 3.14",
