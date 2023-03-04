@@ -43,6 +43,28 @@ import pytest
         yes
 """,
         ),
+        (
+            'dot_operator: viewname.fieldname',
+            """lkml
+    pair
+        dot_operator
+        viewname.fieldname
+""",
+        ),
+        (
+            'refine: +viewname exclude: -fieldname include: ALL_FIELDS*',
+            """lkml
+    pair
+        refine
+        +viewname
+    pair
+        exclude
+        -fieldname
+    pair
+        include
+        ALL_FIELDS*
+""",
+        ),
         # arr
         (
             'values: []',

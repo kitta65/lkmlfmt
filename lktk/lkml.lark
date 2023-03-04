@@ -9,7 +9,8 @@ arr: "[" [value ("," value)*] "]"
       | named_dict
       | ESCAPED_STRING
       | NUMBER
-      | CNAME  # yesno is included
+      | IDENT
+IDENT: [("+" | "-")] CNAME ("." CNAME)* ["*"]
 COMMENT: /#.*/
 CODEBLOCK: /\S.*?(?=\s*;;)/
 CODEBLOCKKEY: "expression" | "html" | /sql\w*/
