@@ -22,13 +22,13 @@ import pytest
 """,
         ),
         (
-            'exprs: ["expr1", "expr2"]',
+            'values: ["value1", "value2"]',
             """lkml
   pair
-    exprs
+    values
     arr
-      "expr1"
-      "expr2"
+      "value1"
+      "value2"
 """,
         ),
         (
