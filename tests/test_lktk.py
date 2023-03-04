@@ -13,6 +13,14 @@ import pytest
     "my project name"
 """,
         ),
+        (
+            'yes_no: yes',
+            """lkml
+  pair
+    yes_no
+    yes
+""",
+        ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:

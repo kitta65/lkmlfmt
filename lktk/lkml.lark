@@ -1,5 +1,8 @@
 lkml: pair (NEWLINE pair)*
-pair: CNAME ":" ESCAPED_STRING
+pair: CNAME ":" expr
+?expr: "yes" -> yes
+     | "no" -> no
+     | ESCAPED_STRING
 
 %import common.CNAME
 %import common.ESCAPED_STRING
