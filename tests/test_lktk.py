@@ -13,43 +13,43 @@ import pytest
         (
             'project_name: "my project name"',
             """lkml
-  pair
-    project_name
-    "my project name"
+    pair
+        project_name
+        "my project name"
 """,
         ),
         (
             'yes_no: yes',
             """lkml
-  pair
-    yes_no
-    yes
+    pair
+        yes_no
+        yes
 """,
         ),
         (
             'values: []',
             """lkml
-  pair
-    values
-    arr\tNone
+    pair
+        values
+        arr\tNone
 """,
         ),
         (
             'values: ["value1", "value2"]',
             """lkml
-  pair
-    values
-    arr
-      "value1"
-      "value2"
+    pair
+        values
+        arr
+            "value1"
+            "value2"
 """,
         ),
         (
             '''dictionary: {}''',
             """lkml
-  pair
-    dictionary
-    dict\tNone
+    pair
+        dictionary
+        dict\tNone
 """,
         ),
         (
@@ -57,12 +57,12 @@ import pytest
   key: "value"
 }''',
             """lkml
-  pair
-    dictionary
-    dict
-      pair
-        key
-        "value"
+    pair
+        dictionary
+        dict
+            pair
+                key
+                "value"
 """,
         ),
         (
@@ -70,18 +70,18 @@ import pytest
   key: "value"
 }''',
             """lkml
-  pair
-    named_dictionary
-    named_dict
-      name
-      dict
-        pair
-          key
-          "value"
+    pair
+        named_dictionary
+        named_dict
+            name
+            dict
+                pair
+                    key
+                    "value"
 """,
         ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:
     tree = lkml_parser.parse(input_)
-    assert tree.pretty() == output
+    assert tree.pretty(indent_str=" " * 4) == output
