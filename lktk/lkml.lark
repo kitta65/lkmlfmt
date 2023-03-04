@@ -1,4 +1,4 @@
-lkml: [pair (NEWLINE pair)*]
+lkml: [pair*]
 pair: CNAME ":" value
 dict: "{" [pair ("," pair)*] "}"
 named_dict: CNAME dict 
@@ -12,6 +12,5 @@ arr: "[" [value ("," value)*] "]"
 
 %import common.CNAME
 %import common.ESCAPED_STRING
-%import common.NEWLINE
 %import common.WS
 %ignore WS

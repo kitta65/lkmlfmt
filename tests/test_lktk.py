@@ -7,7 +7,7 @@ import pytest
     [
         (
             '',
-            """lkml\tNone
+            """lkml
 """,
         ),
         # pair
@@ -17,6 +17,17 @@ import pytest
     pair
         project_name
         "my project name"
+""",
+        ),
+        (
+            'key1: "value1" key2: "value2"',
+            """lkml
+    pair
+        key1
+        "value1"
+    pair
+        key2
+        "value2"
 """,
         ),
         # yesno
