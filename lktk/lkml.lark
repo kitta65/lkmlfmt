@@ -1,4 +1,4 @@
-lkml: [pair*]
+lkml: pair*
 pair: CODEBLOCKKEY ":" CODEBLOCK ";;"
     | CNAME ":" value
 dict: "{" [pair ("," pair)*] "}"
@@ -12,7 +12,7 @@ arr: "[" [value ("," value)*] "]"
       | IDENT
 IDENT: [("+" | "-")] CNAME ("." CNAME)* ["*"]
 COMMENT: /#.*/
-CODEBLOCK: /\S.*?(?=\s*;;)/
+CODEBLOCK: /[^\s;](.|\n)*?(?=\s*;;)/
 CODEBLOCKKEY: "expression" | "html" | /sql\w*/
 
 %import common.CNAME

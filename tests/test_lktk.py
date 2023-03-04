@@ -141,6 +141,18 @@ import pytest
 """,
         ),
         (
+            """expression:
+    multiline
+    code block
+;;""",
+            """lkml
+    pair
+        expression
+        multiline
+    code block
+""",  # strange indent but OK
+        ),
+        (
             "sql: code block 1;; sql_xxx: code block 2;;",
             """lkml
     pair
