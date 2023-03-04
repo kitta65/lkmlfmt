@@ -10,12 +10,14 @@ arr: "[" [value ("," value)*] "]"
       | dict
       | named_dict
       | ESCAPED_STRING
+      | NUMBER
 COMMENT: /#.*/
 CODEBLOCK: /\S.*?(?=\s*;;)/
 CODEBLOCKKEY: "expression" | "html" | /sql\w*/
 
 %import common.CNAME
 %import common.ESCAPED_STRING
+%import common.NUMBER
 %import common.WS
 %ignore WS
 %ignore COMMENT

@@ -133,6 +133,15 @@ import pytest
         code block 2
 """,
         ),
+        # number
+        (
+            'num: 3.14',
+            """lkml
+    pair
+        num
+        3.14
+""",
+        ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:
