@@ -1,9 +1,11 @@
 lkml: pair (NEWLINE pair)*
 pair: CNAME ":" expr
-arr: "[" expr? ("," expr)* "]"
+dict: "{" [pair ("," pair)*] "}"
+arr: "[" [expr ("," expr)*] "]"
 ?expr: "yes" -> yes
      | "no" -> no
      | arr
+     | dict
      | ESCAPED_STRING
 
 %import common.CNAME

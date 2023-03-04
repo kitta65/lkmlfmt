@@ -31,6 +31,19 @@ import pytest
       "expr2"
 """,
         ),
+        (
+            '''dictionary: {
+  key: "value"
+}''',
+            """lkml
+  pair
+    dictionary
+    dict
+      pair
+        key
+        "value"
+""",
+        ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:
