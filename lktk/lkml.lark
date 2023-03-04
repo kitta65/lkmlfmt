@@ -1,4 +1,4 @@
-lkml: pair (NEWLINE pair)*
+lkml: [pair (NEWLINE pair)*]
 pair: CNAME ":" value
 dict: "{" [pair ("," pair)*] "}"
 arr: "[" [value ("," value)*] "]"

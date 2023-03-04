@@ -6,6 +6,11 @@ import pytest
     "input_,output",
     [
         (
+            '',
+            """lkml\tNone
+""",
+        ),
+        (
             'project_name: "my project name"',
             """lkml
   pair
@@ -22,6 +27,14 @@ import pytest
 """,
         ),
         (
+            'values: []',
+            """lkml
+  pair
+    values
+    arr\tNone
+""",
+        ),
+        (
             'values: ["value1", "value2"]',
             """lkml
   pair
@@ -29,6 +42,14 @@ import pytest
     arr
       "value1"
       "value2"
+""",
+        ),
+        (
+            '''dictionary: {}''',
+            """lkml
+  pair
+    dictionary
+    dict\tNone
 """,
         ),
         (
