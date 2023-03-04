@@ -203,6 +203,6 @@ import pytest
         ),
     ],
 )
-def test_dummy(input_: str, output: str) -> None:
+def test_parser(input_: str, output: str) -> None:
     tree = lkml_parser.parse(input_)
     assert tree.pretty(indent_str=" " * 4) == output
