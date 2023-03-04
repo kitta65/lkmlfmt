@@ -6,7 +6,7 @@ import pytest
     "input_,output",
     [
         (
-            '',
+            "",
             """lkml
 """,
         ),
@@ -30,13 +30,13 @@ import pytest
 """,
         ),
         (
-            '# this is comment',
+            "# this is comment",
             """lkml
 """,
         ),
         # ident
         (
-            'yes_no: yes',
+            "yes_no: yes",
             """lkml
     pair
         yes_no
@@ -44,7 +44,7 @@ import pytest
 """,
         ),
         (
-            'dot_operator: viewname.fieldname',
+            "dot_operator: viewname.fieldname",
             """lkml
     pair
         dot_operator
@@ -52,7 +52,7 @@ import pytest
 """,
         ),
         (
-            'refine: +viewname exclude: -fieldname include: ALL_FIELDS*',
+            "refine: +viewname exclude: -fieldname include: ALL_FIELDS*",
             """lkml
     pair
         refine
@@ -67,7 +67,7 @@ import pytest
         ),
         # arr
         (
-            'values: []',
+            "values: []",
             """lkml
     pair
         values
@@ -86,7 +86,7 @@ import pytest
         ),
         # dict
         (
-            '''dictionary: {}''',
+            """dictionary: {}""",
             """lkml
     pair
         dictionary
@@ -94,9 +94,9 @@ import pytest
 """,
         ),
         (
-            '''dictionary: {
+            """dictionary: {
   key: "value"
-}''',
+}""",
             """lkml
     pair
         dictionary
@@ -108,9 +108,9 @@ import pytest
         ),
         # named_dict
         (
-            '''named_dictionary: name {
+            """named_dictionary: name {
   key: "value"
-}''',
+}""",
             """lkml
     pair
         named_dictionary
@@ -133,7 +133,7 @@ import pytest
         ),
         # codeblock
         (
-            'expression: #this is code block ;;',
+            "expression: #this is code block ;;",
             """lkml
     pair
         expression
@@ -141,7 +141,7 @@ import pytest
 """,
         ),
         (
-            'sql: code block 1;; sql_xxx: code block 2;;',
+            "sql: code block 1;; sql_xxx: code block 2;;",
             """lkml
     pair
         sql
@@ -153,7 +153,7 @@ import pytest
         ),
         # number
         (
-            'num: 3.14',
+            "num: 3.14",
             """lkml
     pair
         num
