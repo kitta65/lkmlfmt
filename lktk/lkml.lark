@@ -4,13 +4,12 @@ pair: CODEBLOCKKEY ":" CODEBLOCK ";;"
 dict: "{" [pair ("," pair)*] "}"
 named_dict: CNAME dict 
 arr: "[" [value ("," value)*] "]"
-?value: "yes" -> yes
-      | "no" -> no
-      | arr
+?value: arr
       | dict
       | named_dict
       | ESCAPED_STRING
       | NUMBER
+      | CNAME  # yesno is included
 COMMENT: /#.*/
 CODEBLOCK: /\S.*?(?=\s*;;)/
 CODEBLOCKKEY: "expression" | "html" | /sql\w*/
