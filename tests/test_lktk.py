@@ -65,6 +65,21 @@ import pytest
         "value"
 """,
         ),
+        (
+            '''named_dictionary: name {
+  key: "value"
+}''',
+            """lkml
+  pair
+    named_dictionary
+    named_dict
+      name
+      dict
+        pair
+          key
+          "value"
+""",
+        ),
     ],
 )
 def test_dummy(input_: str, output: str) -> None:

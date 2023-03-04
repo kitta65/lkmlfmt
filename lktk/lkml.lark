@@ -1,11 +1,13 @@
 lkml: [pair (NEWLINE pair)*]
 pair: CNAME ":" value
 dict: "{" [pair ("," pair)*] "}"
+named_dict: CNAME dict 
 arr: "[" [value ("," value)*] "]"
 ?value: "yes" -> yes
       | "no" -> no
       | arr
       | dict
+      | named_dict
       | ESCAPED_STRING
 
 %import common.CNAME
