@@ -10,6 +10,7 @@ import pytest
             """lkml\tNone
 """,
         ),
+        # pair
         (
             'project_name: "my project name"',
             """lkml
@@ -18,6 +19,7 @@ import pytest
         "my project name"
 """,
         ),
+        # yesno
         (
             'yes_no: yes',
             """lkml
@@ -26,6 +28,7 @@ import pytest
         yes
 """,
         ),
+        # arr
         (
             'values: []',
             """lkml
@@ -44,6 +47,7 @@ import pytest
             "value2"
 """,
         ),
+        # dict
         (
             '''dictionary: {}''',
             """lkml
@@ -65,6 +69,7 @@ import pytest
                 "value"
 """,
         ),
+        # named_dict
         (
             '''named_dictionary: name {
   key: "value"
