@@ -128,8 +128,7 @@ key: [
 key: [
   # this is comment
   ident
-]
-""",
+]""",
         ),
     ],
 )

@@ -118,7 +118,7 @@ class LkmlFormatter:
         return f"""{name} {dict_}"""
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
-        lcomments = self.fmt_leading_comments_of(pair.children[0])
+        lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
         key = self.fmt(pair.children[0])
         value = self.fmt(pair.children[1])
         return f"{lcomments}{key}: {value}"
@@ -135,10 +135,7 @@ class LkmlFormatter:
         finally:
             self.curr_indent -= 1
 
-    def get_leading_comments(self, token: Token | ParseTree) -> list[Token]:
-        if not isinstance(token, Token):
-            return self.get_leading_comments(token.children[0])
-
+    def get_leading_comments(self, token: Token) -> list[Token]:
         comments = []
         while (
             0 < len(self.comments)
@@ -149,9 +146,40 @@ class LkmlFormatter:
             comments.append(self.comments.pop(0))
         return comments
 
-    def fmt_leading_comments_of(self, token: Token | ParseTree) -> str:
+    # def get_trailing_comments(self, token: Token) -> list[Token]:
+    #     comments = []
+    #     idx = 0
+    #     line = self.comments[idx].line
+    #     while (
+    #         idx < len(self.comments)
+    #         and token.line is not None
+    #         and line is not None
+    #         and line <= token.line
+    #     ):
+    #         if line == token.line:
+    #             comments.append(self.comments.pop(idx))
+    #         else:
+    #             idx += 1  # if self.comments[idx] is leading comments
+    #         line = self.comments[idx].line
+
+    #     return comments
+
+    def fmt_leading_comments_of(self, token: Token) -> str:
         tokens = self.get_leading_comments(token)
         comments = ""
         if 0 < len(tokens):
-            comments = "".join(map(lambda c: str(c.value).strip() + "\n", tokens))
+            comments = "".join(map(lambda t: str(t.value).strip() + "\n", tokens))
         return comments
+
+    # def fmt_trailing_comments_of(self, token: Token) -> str:
+    #     tokens = self.get_trailing_comments(token)
+    #     if len(tokens) < 1:
+    #         return " "
+    #     comments = " ".join(map(lambda t: str(t.value).strip(), tokens))
+    #     return comments
+
+
+def token(token: Token | ParseTree) -> Token:
+    if isinstance(token, Token):
+        return token
+    raise Exception()
