@@ -8,10 +8,10 @@ from lktk.formatter import LkmlFormatter
     "input_, output",
     [
         (
-            """key1: value1 key2: value2""",
+            """key1: value1 key2: 3.14""",
             """\
 key1: value1
-key2: value2""",
+key2: 3.14""",
         ),
         (
             """key1: parent . child key2: value *""",
