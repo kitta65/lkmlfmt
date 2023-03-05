@@ -31,7 +31,9 @@ def run() -> None:
 
     match args.subcmd:
         case "parse":
-            parse(args.filepath)
+            tree, comments = parse(args.filepath)
+            print(tree.pretty())
+            print(comments)
         case "fmt":
             tree, comments = parse(args.filepath)
             formatter = LkmlFormatter(tree, comments)
