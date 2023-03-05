@@ -71,7 +71,17 @@ class LkmlFormatter:
         pairs = self.fmt(dict_.children)
         if pairs == "":
             return "{}"
-        return f"{{ {pairs} }}"
+
+        lines = pairs.splitlines()
+        if len(lines) == 1:
+            return f"{{ {pairs} }}"
+
+        with self.indent():
+            lines[:] = map(self.prepend_indent, lines)
+            pairs = "\n".join(lines)
+        return f"""{{
+{pairs}
+}}"""
 
     def fmt_lkml(self, lkml: ParseTree) -> str:
         return self.fmt(lkml.children)
