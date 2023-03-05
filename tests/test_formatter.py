@@ -7,34 +7,12 @@ from lktk.formatter import LkmlFormatter
 @pytest.mark.parametrize(
     "input_, output",
     [
+        ("", ""),
         (
             """key1: value1 key2: 3.14""",
             """\
 key1: value1
 key2: 3.14""",
-        ),
-        # comment
-        (
-            """\
-# comment 1
-key1: value1
-# comment 2.1
-# comment 2.2
-key2: value2""",
-            """\
-# comment 1
-key1: value1
-# comment 2.1
-# comment 2.2
-key2: value2""",
-        ),
-        (
-            """\
-# comment 
-key: value""",  # noqa: W291
-            """\
-# comment
-key: value""",
         ),
         # ident
         (
@@ -115,6 +93,43 @@ dict: ident {
     key3: ident3 {}
   }
 }""",
+        ),
+        # comment
+        ("# eof", "# eof"),
+        (
+            """\
+# comment 1
+key1: value1
+# comment 2.1
+# comment 2.2
+key2: value2""",
+            """\
+# comment 1
+key1: value1
+# comment 2.1
+# comment 2.2
+key2: value2""",
+        ),
+        (
+            """\
+# comment 
+key: value""",  # noqa: W291
+            """\
+# comment
+key: value""",
+        ),
+        (
+            """\
+key: [
+  # this is comment
+  ident
+]""",  # noqa: W291
+            """\
+key: [
+  # this is comment
+  ident
+]
+""",
         ),
     ],
 )

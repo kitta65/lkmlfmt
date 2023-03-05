@@ -36,7 +36,8 @@ class LkmlFormatter:
             return ("\n" if sep is None else sep).join(elms)
 
         if isinstance(t, Token):
-            return WS.sub("", str(t.value))
+            comments = self.fmt_leading_comments_of(t)
+            return comments + WS.sub("", str(t.value))
 
         match t.data:
             case "arr":
@@ -101,8 +102,12 @@ class LkmlFormatter:
 {pairs}
 }}"""
 
-    def fmt_lkml(self, lkml: ParseTree) -> str:
-        return self.fmt(lkml.children)
+    def fmt_lkml(self, lookml: ParseTree) -> str:
+        lkml = self.fmt(lookml.children)
+        comments = ""
+        while 0 < len(self.comments):
+            comments += f"\n{str(self.comments.pop(0).value).strip()}"
+        return (lkml + comments).strip()
 
     def fmt_named_dict(self, ndict: ParseTree) -> str:
         name = self.fmt(ndict.children[0])
