@@ -39,6 +39,8 @@ class LkmlFormatter:
             return WS.sub("", str(t.value))
 
         match t.data:
+            case "arr":
+                return self.fmt_arr(t)
             case "code_pair":
                 return self.fmt_code_pair(t)
             case "dict":
@@ -50,6 +52,23 @@ class LkmlFormatter:
             case _:
                 print(f"unknown data: {t.data}")
                 return ""
+
+    def fmt_arr(self, arr: ParseTree) -> str:
+        if arr.children[0] is None:
+            return "[]"
+
+        values = self.fmt(arr.children, ",\n")
+
+        lines = values.splitlines()
+        if len(lines) == 1:
+            return f"[ {values} ]"
+
+        with self.indent():
+            lines[:] = map(self.prepend_indent, lines)
+            pairs = "\n".join(lines)
+            return f"""[
+{pairs}
+]"""
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
         # TODO fmt code block itself

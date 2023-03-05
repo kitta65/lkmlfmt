@@ -19,6 +19,27 @@ key2: value2""",
 key1: parent.child
 key2: value*""",
         ),
+        # arr
+        (
+            """values: []""",
+            """values: []""",
+        ),
+        (
+            """values: [ value ]""",
+            """values: [ value ]""",
+        ),
+        (
+            """values: [ value1, value2, [value3, value4], [value5] ]""",
+            """values: [
+  value1,
+  value2,
+  [
+    value3,
+    value4
+  ],
+  [ value5 ]
+]""",
+        ),
         # code block
         (
             """sql: code block ;;""",
