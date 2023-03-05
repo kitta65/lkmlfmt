@@ -13,6 +13,12 @@ from lktk.formatter import LkmlFormatter
 key1: value1
 key2: value2""",
         ),
+        (
+            """key1: parent . child key2: value *""",
+            """\
+key1: parent.child
+key2: value*""",
+        ),
         # code block
         (
             """sql: code block ;;""",

@@ -49,7 +49,7 @@ class LkmlFormatter:
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         key = self.fmt(pair.children[0])
-        value = self.fmt(pair.children[1])
+        value = self.fmt(pair.children[1]).replace(" ", "")
         return f"{key}: {value}"
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
