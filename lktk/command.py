@@ -2,7 +2,8 @@ from dataclasses import dataclass
 from pathlib import Path
 import argparse
 
-from lktk.parser import lkml_parser
+from lktk.parser import parse
+from lktk.formatter import LkmlFormatter
 
 
 @dataclass
@@ -15,7 +16,7 @@ def parse_args() -> Args:
     parser = argparse.ArgumentParser(
         prog="Looker Toolkit", description="unofficial looker CLI"
     )
-    parser.add_argument("subcmd", type=Path)
+    parser.add_argument("subcmd")
     parser.add_argument("filepath", type=Path)
     args = parser.parse_args()
 
@@ -25,19 +26,15 @@ def parse_args() -> Args:
     )
 
 
-def debug(args: Args) -> None:
-    with open(args.filepath) as f:
-        tree = lkml_parser.parse(f.read())
-    print(tree.pretty())
-
-
 def run() -> None:
     args = parse_args()
 
     match args.subcmd:
-        case "debug":
-            debug(args)
+        case "parse":
+            parse(args.filepath)
         case "fmt":
-            pass
+            tree = parse(args.filepath)
+            formatter = LkmlFormatter(tree, tree)
+            formatter.print()
         case _:
             print(f"invalid subcmd: {args.subcmd}")
