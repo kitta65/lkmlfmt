@@ -113,15 +113,10 @@ class LkmlFormatter:
         return f"""{name} {dict_}"""
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
-        following_comments = self.get_leading_comments(pair.children[0])
-        formatted_following_comments = ""
-        if 0 < len(following_comments):
-            formatted_following_comments = "".join(
-                map(lambda c: str(c.value).strip() + "\n", following_comments)
-            )
+        lcomments = self.fmt_leading_comments_of(pair.children[0])
         key = self.fmt(pair.children[0])
         value = self.fmt(pair.children[1])
-        return f"{formatted_following_comments}{key}: {value}"
+        return f"{lcomments}{key}: {value}"
 
     def prepend_indent(self, line: str) -> str:
         return " " * INDENT_WIDTH * self.curr_indent + line
@@ -147,4 +142,11 @@ class LkmlFormatter:
             and self.comments[0].line < token.line
         ):
             comments.append(self.comments.pop(0))
+        return comments
+
+    def fmt_leading_comments_of(self, token: Token | ParseTree) -> str:
+        tokens = self.get_leading_comments(token)
+        comments = ""
+        if 0 < len(tokens):
+            comments = "".join(map(lambda c: str(c.value).strip() + "\n", tokens))
         return comments
