@@ -44,26 +44,29 @@ from lktk.parser import lkml_parser
         yes
 """,
         ),
-        (
-            "dot_operator: viewname.fieldname",
+        (  # space surrounding . is allowed
+            "dot1: viewname.fieldname dot2: viewname . fieldname",
             """lkml
     value_pair
-        dot_operator
+        dot1
         viewname.fieldname
+    value_pair
+        dot2
+        viewname . fieldname
 """,
         ),
-        (
-            "refine: +viewname exclude: -fieldname include: ALL_FIELDS*",
+        (  # space between +-* and ident is allowed
+            "refine: + viewname exclude: -fieldname include: ALL_FIELDS *",
             """lkml
     value_pair
         refine
-        +viewname
+        + viewname
     value_pair
         exclude
         -fieldname
     value_pair
         include
-        ALL_FIELDS*
+        ALL_FIELDS *
 """,
         ),
         # arr

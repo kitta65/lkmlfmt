@@ -11,7 +11,7 @@ arr: "[" [(value | pair) ("," (value | pair))*] "]"
       | ESCAPED_STRING
       | NUMBER
       | IDENT
-IDENT: [("+" | "-")] CNAME ("." CNAME)* ["*"]
+IDENT: [/(\+|-)\s*/] CNAME (/\s*\.\s*/ CNAME)* [/\s*?\*/]
 COMMENT: /#.*/
 // \S is needed cause 0 width regexp is not allowed here
 CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
