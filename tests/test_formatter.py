@@ -94,7 +94,7 @@ dict: ident {
   }
 }""",
         ),
-        # comment
+        # leading comments
         ("# eof", "# eof"),
         (
             """\
@@ -130,6 +130,8 @@ key: [
   ident
 ]""",
         ),
+        # trailing comments
+        ("key: value # comment", "key: value # comment"),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:

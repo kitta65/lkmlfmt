@@ -4,8 +4,10 @@ import re
 
 from lark import ParseTree, Token
 
+COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 INDENT_WIDTH = 2
 WS = re.compile(r"\s")
+COMMENT = re.compile(fr"{COMMENT_MARKER}")
 
 
 class LkmlFormatter:
@@ -36,8 +38,9 @@ class LkmlFormatter:
             return ("\n" if sep is None else sep).join(elms)
 
         if isinstance(t, Token):
-            comments = self.fmt_leading_comments_of(t)
-            return comments + WS.sub("", str(t.value))
+            lcomments = self.fmt_leading_comments_of(t)
+            tcomments = self.fmt_trailing_comments_of(t)
+            return lcomments + WS.sub("", str(t.value)) + tcomments
 
         match t.data:
             case "arr":
@@ -104,10 +107,20 @@ class LkmlFormatter:
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
         lkml = self.fmt(lookml.children)
-        comments = ""
         while 0 < len(self.comments):
-            comments += f"\n{str(self.comments.pop(0).value).strip()}"
-        return (lkml + comments).strip()
+            lkml += f"\n{str(self.comments.pop(0).value).rstrip()}"
+        lkml = lkml.lstrip()  # in the case of lkml == "\n#comment"
+
+        lines = []
+        for line in lkml.splitlines():
+            pieces = COMMENT.split(line)
+            main = ''.join(pieces[0::2])
+            tcomments = ' '.join(pieces[1::2])
+            if tcomments == '':
+                lines.append(f"{main}")
+            else:
+                lines.append(f"{main} {tcomments}")
+        return "\n".join(lines)
 
     def fmt_named_dict(self, ndict: ParseTree) -> str:
         name = self.fmt(ndict.children[0])
@@ -146,37 +159,36 @@ class LkmlFormatter:
             comments.append(self.comments.pop(0))
         return comments
 
-    # def get_trailing_comments(self, token: Token) -> list[Token]:
-    #     comments = []
-    #     idx = 0
-    #     line = self.comments[idx].line
-    #     while (
-    #         idx < len(self.comments)
-    #         and token.line is not None
-    #         and line is not None
-    #         and line <= token.line
-    #     ):
-    #         if line == token.line:
-    #             comments.append(self.comments.pop(idx))
-    #         else:
-    #             idx += 1  # if self.comments[idx] is leading comments
-    #         line = self.comments[idx].line
-
-    #     return comments
+    # NOTE since looker doen't support inline comment, maybe len(result) == 1
+    def get_trailing_comments(self, token: Token) -> list[Token]:
+        comments = []
+        idx = 0
+        # line = self.comments[idx].line
+        while (
+            idx < len(self.comments)
+            and token.line is not None
+            and (line := self.comments[idx].line) is not None
+            and line <= token.line
+        ):
+            if line == token.line:
+                comments.append(self.comments.pop(idx))
+                continue
+            idx += 1  # if self.comments[idx] is leading comments
+        return comments
 
     def fmt_leading_comments_of(self, token: Token) -> str:
         tokens = self.get_leading_comments(token)
         comments = ""
         if 0 < len(tokens):
-            comments = "".join(map(lambda t: str(t.value).strip() + "\n", tokens))
+            comments = "".join(map(lambda t: str(t.value).rstrip() + "\n", tokens))
         return comments
 
-    # def fmt_trailing_comments_of(self, token: Token) -> str:
-    #     tokens = self.get_trailing_comments(token)
-    #     if len(tokens) < 1:
-    #         return " "
-    #     comments = " ".join(map(lambda t: str(t.value).strip(), tokens))
-    #     return comments
+    def fmt_trailing_comments_of(self, token: Token) -> str:
+        tokens = self.get_trailing_comments(token)
+        if len(tokens) < 1:
+            return ""
+        comments = " ".join(map(lambda t: str(t.value).rstrip(), tokens))
+        return COMMENT_MARKER + comments + COMMENT_MARKER
 
 
 def token(token: Token | ParseTree) -> Token:
