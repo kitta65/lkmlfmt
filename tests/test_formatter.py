@@ -12,7 +12,11 @@ from lktk.formatter import LkmlFormatter
             """\
 key1: value1
 key2: value2""",
-        )
+        ),
+        (
+            """sql: code block ;;""",
+            """sql: code block ;;""",
+        ),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:

@@ -26,13 +26,15 @@ class LkmlFormatter:
             return "\n".join(elms)
 
         if isinstance(t, Token):
-            return t.value
+            return f"{t.value}"
 
         match t.data:
             case "lkml":
                 return self.fmt_lkml(t)
-            case "pair":
-                return self.fmt_pair(t)
+            case "value_pair":
+                return self.fmt_value_pair(t)
+            case "code_pair":
+                return self.fmt_code_pair(t)
             case _:
                 print(f"unknown data: {t.data}")
                 return ""
@@ -40,7 +42,12 @@ class LkmlFormatter:
     def fmt_lkml(self, lkml: ParseTree) -> str:
         return self.fmt(lkml.children)
 
-    def fmt_pair(self, pair: ParseTree) -> str:
+    def fmt_value_pair(self, pair: ParseTree) -> str:
         key = self.fmt(pair.children[0])
         value = self.fmt(pair.children[1])
         return f"{key}: {value}"
+
+    def fmt_code_pair(self, pair: ParseTree) -> str:
+        key = self.fmt(pair.children[0])
+        value = self.fmt(pair.children[1])
+        return f"{key}: {value} ;;"

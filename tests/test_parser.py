@@ -14,7 +14,7 @@ from lktk.parser import lkml_parser
         (
             'project_name: "my project name"',
             """lkml
-    pair
+    value_pair
         project_name
         "my project name"
 """,
@@ -22,10 +22,10 @@ from lktk.parser import lkml_parser
         (
             'key1: "value1" key2: "value2"',
             """lkml
-    pair
+    value_pair
         key1
         "value1"
-    pair
+    value_pair
         key2
         "value2"
 """,
@@ -39,7 +39,7 @@ from lktk.parser import lkml_parser
         (
             "yes_no: yes",
             """lkml
-    pair
+    value_pair
         yes_no
         yes
 """,
@@ -47,7 +47,7 @@ from lktk.parser import lkml_parser
         (
             "dot_operator: viewname.fieldname",
             """lkml
-    pair
+    value_pair
         dot_operator
         viewname.fieldname
 """,
@@ -55,13 +55,13 @@ from lktk.parser import lkml_parser
         (
             "refine: +viewname exclude: -fieldname include: ALL_FIELDS*",
             """lkml
-    pair
+    value_pair
         refine
         +viewname
-    pair
+    value_pair
         exclude
         -fieldname
-    pair
+    value_pair
         include
         ALL_FIELDS*
 """,
@@ -70,7 +70,7 @@ from lktk.parser import lkml_parser
         (
             "values: []",
             """lkml
-    pair
+    value_pair
         values
         arr\tNone
 """,
@@ -78,7 +78,7 @@ from lktk.parser import lkml_parser
         (
             'values: ["value1", "value2"]',
             """lkml
-    pair
+    value_pair
         values
         arr
             "value1"
@@ -88,10 +88,10 @@ from lktk.parser import lkml_parser
         (
             'always_filter: [viewname.fieldname: "condition"]',
             """lkml
-    pair
+    value_pair
         always_filter
         arr
-            pair
+            value_pair
                 viewname.fieldname
                 "condition"
 """,
@@ -100,7 +100,7 @@ from lktk.parser import lkml_parser
         (
             """dictionary: {}""",
             """lkml
-    pair
+    value_pair
         dictionary
         dict
 """,
@@ -108,10 +108,10 @@ from lktk.parser import lkml_parser
         (
             """dictionary: {key: "value"}""",
             """lkml
-    pair
+    value_pair
         dictionary
         dict
-            pair
+            value_pair
                 key
                 "value"
 """,
@@ -119,13 +119,13 @@ from lktk.parser import lkml_parser
         (
             """dictionary: {key1: "value1" key2: "value2"}""",
             """lkml
-    pair
+    value_pair
         dictionary
         dict
-            pair
+            value_pair
                 key1
                 "value1"
-            pair
+            value_pair
                 key2
                 "value2"
 """,
@@ -136,12 +136,12 @@ from lktk.parser import lkml_parser
   key: "value"
 }""",
             """lkml
-    pair
+    value_pair
         named_dictionary
         named_dict
             name
             dict
-                pair
+                value_pair
                     key
                     "value"
 """,
@@ -150,7 +150,7 @@ from lktk.parser import lkml_parser
         (
             'key: "value # not comment"',
             """lkml
-    pair
+    value_pair
         key
         "value # not comment"
 """,
@@ -159,7 +159,7 @@ from lktk.parser import lkml_parser
         (
             "expression: #this is code block ;;",
             """lkml
-    pair
+    code_pair
         expression
         #this is code block
 """,
@@ -170,7 +170,7 @@ from lktk.parser import lkml_parser
     code block
 ;;""",
             """lkml
-    pair
+    code_pair
         expression
         multiline
     code block
@@ -179,10 +179,10 @@ from lktk.parser import lkml_parser
         (
             "sql: code block 1;; sql_xxx: code block 2;;",
             """lkml
-    pair
+    code_pair
         sql
         code block 1
-    pair
+    code_pair
         sql_xxx
         code block 2
 """,
@@ -190,14 +190,14 @@ from lktk.parser import lkml_parser
         (
             "sql:;;",
             """lkml
-    pair\tsql
+    code_pair\tsql
 """,
         ),
         # number
         (
             "num: 3.14",
             """lkml
-    pair
+    value_pair
         num
         3.14
 """,
