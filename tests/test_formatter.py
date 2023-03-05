@@ -34,6 +34,11 @@ sql:
   block
 ;;""",
         ),
+        # dict
+        (
+            """dict: {}""",
+            """dict: {}""",
+        ),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:

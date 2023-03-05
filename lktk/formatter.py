@@ -27,7 +27,7 @@ class LkmlFormatter:
         tree: ParseTree | Token | list[ParseTree | Token] | None = None,
         sep: str | None = None,
     ) -> str:
-        t = tree or self.tree
+        t = self.tree if tree is None else tree
 
         if isinstance(t, list):
             elms = []
@@ -39,23 +39,17 @@ class LkmlFormatter:
             return f"{t.value}"
 
         match t.data:
+            case "code_pair":
+                return self.fmt_code_pair(t)
+            case "dict":
+                return self.fmt_dict(t)
             case "lkml":
                 return self.fmt_lkml(t)
             case "value_pair":
                 return self.fmt_value_pair(t)
-            case "code_pair":
-                return self.fmt_code_pair(t)
             case _:
                 print(f"unknown data: {t.data}")
                 return ""
-
-    def fmt_lkml(self, lkml: ParseTree) -> str:
-        return self.fmt(lkml.children)
-
-    def fmt_value_pair(self, pair: ParseTree) -> str:
-        key = self.fmt(pair.children[0])
-        value = WS.sub("", self.fmt(pair.children[1]))
-        return f"{key}: {value}"
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
         # TODO fmt code block itself
@@ -72,6 +66,18 @@ class LkmlFormatter:
             return f"""{key}:
 {value}
 ;;"""
+
+    def fmt_dict(self, dict_: ParseTree) -> str:
+        pairs = self.fmt(dict_.children)
+        return f"{{ {pairs} }}"
+
+    def fmt_lkml(self, lkml: ParseTree) -> str:
+        return self.fmt(lkml.children)
+
+    def fmt_value_pair(self, pair: ParseTree) -> str:
+        key = self.fmt(pair.children[0])
+        value = WS.sub("", self.fmt(pair.children[1]))
+        return f"{key}: {value}"
 
     def prepend_indent(self, line: str) -> str:
         return " " * INDENT_WIDTH * self.curr_indent + line
