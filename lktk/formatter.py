@@ -1,6 +1,11 @@
+from contextlib import contextmanager
+from typing import Generator
+import re
+
 from lark import ParseTree, Token
 
 INDENT_WIDTH = 2
+WS = re.compile(r"\s")
 
 
 class LkmlFormatter:
@@ -49,7 +54,7 @@ class LkmlFormatter:
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         key = self.fmt(pair.children[0])
-        value = self.fmt(pair.children[1]).replace(" ", "")
+        value = WS.sub("", self.fmt(pair.children[1]))
         return f"{key}: {value}"
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
@@ -60,13 +65,22 @@ class LkmlFormatter:
         if len(lines) == 1:
             return f"{key}: {value} ;;"
 
-        # https://stackoverflow.com/questions/3000461/python-map-in-place
-        lines[:] = map(self.prepend_indent, lines)
-        value = "\n".join(lines)
-        return f"""{key}:
+        with self.indent():
+            # https://stackoverflow.com/questions/3000461/python-map-in-place
+            lines[:] = map(self.prepend_indent, lines)
+            value = "\n".join(lines)
+            return f"""{key}:
 {value}
 ;;"""
 
     def prepend_indent(self, line: str) -> str:
-        # TODO take care of self.curr_indent
-        return " " * INDENT_WIDTH + line
+        return " " * INDENT_WIDTH * self.curr_indent + line
+
+    # https://stackoverflow.com/questions/49733699/python-type-hints-and-context-managers
+    @contextmanager
+    def indent(self) -> Generator[None, None, None]:
+        self.curr_indent += 1
+        try:
+            yield
+        finally:
+            self.curr_indent -= 1
