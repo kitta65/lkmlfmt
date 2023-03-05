@@ -9,8 +9,10 @@ class LkmlFormatter:
         self.comments = comments
         self.curr_indent = 0
 
-    def print(self) -> None:
-        print(self.fmt())
+    def print(self) -> str:
+        text = self.fmt()
+        print(text)
+        return text
 
     def fmt(
         self, tree: ParseTree | Token | list[ParseTree | Token] | None = None
@@ -24,7 +26,7 @@ class LkmlFormatter:
             return "\n".join(elms)
 
         if isinstance(t, Token):
-            return "token"
+            return t.value
 
         match t.data:
             case "lkml":
@@ -36,11 +38,9 @@ class LkmlFormatter:
                 return ""
 
     def fmt_lkml(self, lkml: ParseTree) -> str:
-        # self.result.append(":")
         return self.fmt(lkml.children)
 
     def fmt_pair(self, pair: ParseTree) -> str:
-        self.fmt(pair.children[0])
-        # self.result.append(":")
-        self.fmt(pair.children[1])
-        return "pair"
+        key = self.fmt(pair.children[0])
+        value = self.fmt(pair.children[1])
+        return f"{key}: {value}"

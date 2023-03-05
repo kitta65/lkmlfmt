@@ -1,5 +1,6 @@
-from lktk.parser import lkml_parser
 import pytest
+
+from lktk.parser import lkml_parser
 
 
 @pytest.mark.parametrize(
