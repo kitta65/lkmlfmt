@@ -3,7 +3,7 @@ code_pair: CODEBLOCKKEY ":" CODEBLOCK? ";;"
 value_pair: IDENT ":" value
 ?pair: code_pair | value_pair
 dict: "{" pair* "}"
-named_dict: CNAME dict 
+named_dict: IDENT dict
 arr: "[" [(value | pair) ("," (value | pair))*] "]"
 ?value: arr
       | dict
@@ -15,7 +15,8 @@ IDENT: [/(\+|-)\s*/] CNAME (/\s*\.\s*/ CNAME)* [/\s*?\*/]
 COMMENT: /#.*/
 // \S is needed cause 0 width regexp is not allowed here
 CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
-CODEBLOCKKEY: "expression" | "html" | /sql\w*/
+// higher priority than IDENT
+CODEBLOCKKEY.1: "expression" | "html" | /sql\w*/
 
 %import common.CNAME
 %import common.ESCAPED_STRING
