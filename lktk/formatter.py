@@ -36,7 +36,7 @@ class LkmlFormatter:
             return ("\n" if sep is None else sep).join(elms)
 
         if isinstance(t, Token):
-            return f"{t.value}"
+            return WS.sub("", str(t.value))
 
         match t.data:
             case "code_pair":
@@ -54,7 +54,7 @@ class LkmlFormatter:
     def fmt_code_pair(self, pair: ParseTree) -> str:
         # TODO fmt code block itself
         key = self.fmt(pair.children[0])
-        value = self.fmt(pair.children[1])
+        value = str(pair.children[1])  # don't call self.fmt which remove WS
         lines = value.splitlines()
         if len(lines) == 1:
             return f"{key}: {value} ;;"
@@ -69,6 +69,8 @@ class LkmlFormatter:
 
     def fmt_dict(self, dict_: ParseTree) -> str:
         pairs = self.fmt(dict_.children)
+        if pairs == "":
+            return "{}"
         return f"{{ {pairs} }}"
 
     def fmt_lkml(self, lkml: ParseTree) -> str:
@@ -76,7 +78,7 @@ class LkmlFormatter:
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         key = self.fmt(pair.children[0])
-        value = WS.sub("", self.fmt(pair.children[1]))
+        value = self.fmt(pair.children[1])
         return f"{key}: {value}"
 
     def prepend_indent(self, line: str) -> str:

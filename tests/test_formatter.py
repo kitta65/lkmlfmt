@@ -39,6 +39,10 @@ sql:
             """dict: {}""",
             """dict: {}""",
         ),
+        (
+            """dict: { key: value }""",
+            """dict: { key: value }""",
+        ),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:
