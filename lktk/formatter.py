@@ -73,13 +73,10 @@ class LkmlFormatter:
             return "{}"
 
         lines = pairs.splitlines()
-        if len(lines) == 1:
-            return f"{{ {pairs} }}"
-
         with self.indent():
             lines[:] = map(self.prepend_indent, lines)
             pairs = "\n".join(lines)
-        return f"""{{
+            return f"""{{
 {pairs}
 }}"""
 

@@ -41,14 +41,20 @@ sql:
         ),
         (
             """dict: { key: value }""",
-            """dict: { key: value }""",
+            """dict: {
+  key: value
+}""",
         ),
         (
-            """dict: { key1: value1 key2: value2}""",
+            """dict: {
+  key1: {key2: value2 key3: value3}
+}""",
             """\
 dict: {
-  key1: value1
-  key2: value2
+  key1: {
+    key2: value2
+    key3: value3
+  }
 }""",
         ),
     ],
