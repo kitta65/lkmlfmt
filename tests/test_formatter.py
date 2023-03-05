@@ -13,6 +13,30 @@ from lktk.formatter import LkmlFormatter
 key1: value1
 key2: 3.14""",
         ),
+        # comment
+        (
+            """\
+# comment 1
+key1: value1
+# comment 2.1
+# comment 2.2
+key2: value2""",
+            """\
+# comment 1
+key1: value1
+# comment 2.1
+# comment 2.2
+key2: value2""",
+        ),
+        (
+            """\
+# comment 
+key: value""",  # noqa: W291
+            """\
+# comment
+key: value""",
+        ),
+        # ident
         (
             """key1: parent . child key2: value *""",
             """\

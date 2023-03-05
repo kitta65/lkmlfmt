@@ -13,7 +13,7 @@ with open(DIR / "lkml.lark") as f:
         start="lkml",
         # https://lark-parser.readthedocs.io/en/latest/json_tutorial.html#step-2-lalr-1
         parser="lalr",
-        lexer_callbacks={'COMMENT': comments.append}
+        lexer_callbacks={"COMMENT": comments.append},
     )
 
 
