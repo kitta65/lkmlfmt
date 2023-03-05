@@ -1,6 +1,6 @@
 import pytest
 
-from lktk.parser import lkml_parser
+from lktk.parser import lkml_parser, comments
 from lktk.formatter import LkmlFormatter
 
 
@@ -96,5 +96,5 @@ dict: ident {
 )
 def test_formatter(input_: str, output: str) -> None:
     tree = lkml_parser.parse(input_)
-    text = LkmlFormatter(tree, tree).print()
+    text = LkmlFormatter(tree, comments).print()
     assert text == output

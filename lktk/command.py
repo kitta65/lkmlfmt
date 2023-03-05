@@ -33,8 +33,8 @@ def run() -> None:
         case "parse":
             parse(args.filepath)
         case "fmt":
-            tree = parse(args.filepath)
-            formatter = LkmlFormatter(tree, tree)
+            tree, comments = parse(args.filepath)
+            formatter = LkmlFormatter(tree, comments)
             formatter.print()
         case _:
             print(f"invalid subcmd: {args.subcmd}")

@@ -9,7 +9,7 @@ WS = re.compile(r"\s")
 
 
 class LkmlFormatter:
-    def __init__(self, tree: ParseTree, comments: ParseTree) -> None:
+    def __init__(self, tree: ParseTree, comments: list[Token]) -> None:
         self.tree = tree
         self.comments = comments  # TODO
         self.curr_indent = 0
