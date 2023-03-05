@@ -13,9 +13,20 @@ from lktk.formatter import LkmlFormatter
 key1: value1
 key2: value2""",
         ),
+        # code block
         (
             """sql: code block ;;""",
             """sql: code block ;;""",
+        ),
+        (
+            """\
+sql: code
+block ;;""",
+            """\
+sql:
+  code
+  block
+;;""",
         ),
     ],
 )

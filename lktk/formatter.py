@@ -6,7 +6,7 @@ INDENT_WIDTH = 2
 class LkmlFormatter:
     def __init__(self, tree: ParseTree, comments: ParseTree) -> None:
         self.tree = tree
-        self.comments = comments
+        self.comments = comments  # TODO
         self.curr_indent = 0
 
     def print(self) -> str:
@@ -14,8 +14,13 @@ class LkmlFormatter:
         print(text)
         return text
 
+    # NOTE
+    # parents take care of indentation of the children
+    # parents take care of separator of the children
     def fmt(
-        self, tree: ParseTree | Token | list[ParseTree | Token] | None = None
+        self,
+        tree: ParseTree | Token | list[ParseTree | Token] | None = None,
+        sep: str | None = None,
     ) -> str:
         t = tree or self.tree
 
@@ -23,7 +28,7 @@ class LkmlFormatter:
             elms = []
             for elm in t:
                 elms.append(self.fmt(elm))
-            return "\n".join(elms)
+            return ("\n" if sep is None else sep).join(elms)
 
         if isinstance(t, Token):
             return f"{t.value}"
@@ -48,6 +53,20 @@ class LkmlFormatter:
         return f"{key}: {value}"
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
+        # TODO fmt code block itself
         key = self.fmt(pair.children[0])
         value = self.fmt(pair.children[1])
-        return f"{key}: {value} ;;"
+        lines = value.splitlines()
+        if len(lines) == 1:
+            return f"{key}: {value} ;;"
+
+        # https://stackoverflow.com/questions/3000461/python-map-in-place
+        lines[:] = map(self.prepend_indent, lines)
+        value = "\n".join(lines)
+        return f"""{key}:
+{value}
+;;"""
+
+    def prepend_indent(self, line: str) -> str:
+        # TODO take care of self.curr_indent
+        return " " * INDENT_WIDTH + line
