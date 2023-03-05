@@ -78,6 +78,20 @@ dict: {
   }
 }""",
         ),
+        # named dict
+        (
+            """dict: ident {
+  key1: ident1 {}
+  key2: ident2 { key3: ident3 { } }
+}""",
+            """\
+dict: ident {
+  key1: ident1 {}
+  key2: ident2 {
+    key3: ident3 {}
+  }
+}""",
+        ),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:

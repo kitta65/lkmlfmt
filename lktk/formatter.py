@@ -47,6 +47,8 @@ class LkmlFormatter:
                 return self.fmt_dict(t)
             case "lkml":
                 return self.fmt_lkml(t)
+            case "named_dict":
+                return self.fmt_named_dict(t)
             case "value_pair":
                 return self.fmt_value_pair(t)
             case _:
@@ -101,6 +103,14 @@ class LkmlFormatter:
 
     def fmt_lkml(self, lkml: ParseTree) -> str:
         return self.fmt(lkml.children)
+
+    def fmt_named_dict(self, ndict: ParseTree) -> str:
+        name = self.fmt(ndict.children[0])
+        dict_ = self.fmt(ndict.children[1])
+        # NOTE
+        # do not have to take care of indentation of the children
+        # cause this is a simple wrapper of fmt_dict
+        return f"""{name} {dict_}"""
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         key = self.fmt(pair.children[0])
