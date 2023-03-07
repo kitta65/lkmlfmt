@@ -78,17 +78,18 @@ class LkmlFormatter:
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
         # TODO fmt code block itself
+        lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])  # don't call self.fmt which remove WS
         lines = value.splitlines()
         if len(lines) == 1:
-            return f"{key}: {value} ;;"
+            return f"{lcomments}{key}: {value} ;;"
 
         with self.indent():
             # https://stackoverflow.com/questions/3000461/python-map-in-place
             lines[:] = map(self.prepend_indent, lines)
             value = "\n".join(lines)
-            return f"""{key}:
+            return f"""{lcomments}{key}:
 {value}
 ;;"""
 
