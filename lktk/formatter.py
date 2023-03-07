@@ -13,7 +13,7 @@ COMMENT = re.compile(fr"{COMMENT_MARKER}")
 class LkmlFormatter:
     def __init__(self, tree: ParseTree, comments: list[Token]) -> None:
         self.tree = tree
-        self.comments = comments  # TODO
+        self.comments = comments
         self.curr_indent = 0
 
     def print(self) -> str:
@@ -133,9 +133,11 @@ class LkmlFormatter:
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
+        tcomments = self.fmt_trailing_comments_of(token(pair.children[0]))
+
         key = self.fmt(pair.children[0])
         value = self.fmt(pair.children[1])
-        return f"{lcomments}{key}: {value}"
+        return f"{lcomments}{key}:{tcomments} {value}"
 
     def prepend_indent(self, line: str) -> str:
         return " " * INDENT_WIDTH * self.curr_indent + line

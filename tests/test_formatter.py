@@ -112,6 +112,20 @@ key2: value2""",
         ),
         (
             """\
+# comment a
+sql_a: code a ;;
+# comment b.1
+# comment b.2
+sql_b: code b ;;""",
+            """\
+# comment a
+sql_a: code a ;;
+# comment b.1
+# comment b.2
+sql_b: code b ;;""",
+        ),
+        (
+            """\
 # comment 
 key: value""",  # noqa: W291
             """\
@@ -123,7 +137,7 @@ key: value""",
 key: [
   # this is comment
   ident
-]""",  # noqa: W291
+]""",
             """\
 key: [
   # this is comment
@@ -132,6 +146,13 @@ key: [
         ),
         # trailing comments
         ("key: value # comment", "key: value # comment"),
+        ("""\
+key: { # comment
+  key: pair
+}""", """\
+key: { # comment
+  key: pair
+}"""),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:
