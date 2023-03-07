@@ -70,7 +70,7 @@ class LkmlFormatter:
             return f"[ {values} ]"
 
         with self.indent():
-            lines[:] = map(self.prepend_indent, lines)
+            self.prepend_indent(lines)
             pairs = "\n".join(lines)
             return f"""[
 {pairs}
@@ -86,8 +86,7 @@ class LkmlFormatter:
             return f"{lcomments}{key}: {value} ;;"
 
         with self.indent():
-            # https://stackoverflow.com/questions/3000461/python-map-in-place
-            lines[:] = map(self.prepend_indent, lines)
+            self.prepend_indent(lines)
             value = "\n".join(lines)
             return f"""{lcomments}{key}:
 {value}
@@ -100,7 +99,7 @@ class LkmlFormatter:
 
         lines = pairs.splitlines()
         with self.indent():
-            lines[:] = map(self.prepend_indent, lines)
+            self.prepend_indent(lines)
             pairs = "\n".join(lines)
             return f"""{{
 {pairs}
@@ -139,8 +138,10 @@ class LkmlFormatter:
         value = self.fmt(pair.children[1])
         return f"{lcomments}{key}:{tcomments} {value}"
 
-    def prepend_indent(self, line: str) -> str:
-        return " " * INDENT_WIDTH * self.curr_indent + line
+    def prepend_indent(self, lines: list[str]) -> None:
+        # https://stackoverflow.com/questions/3000461/python-map-in-place
+        indent = " " * INDENT_WIDTH * self.curr_indent
+        lines[:] = map(lambda line: indent + line, lines)
 
     # https://stackoverflow.com/questions/49733699/python-type-hints-and-context-managers
     @contextmanager
