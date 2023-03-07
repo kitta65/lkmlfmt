@@ -156,6 +156,12 @@ key: { # comment
     ],
 )
 def test_formatter(input_: str, output: str) -> None:
-    tree = lkml_parser.parse(input_)
-    text = LkmlFormatter(tree, comments).print()
-    assert text == output
+    # once formatted text matches expected output
+    tree1 = lkml_parser.parse(input_)
+    text1 = LkmlFormatter(tree1, comments).print()
+    assert text1 == output
+
+    # twice formatted text also matches expected output
+    tree2 = lkml_parser.parse(text1)
+    text2 = LkmlFormatter(tree2, comments).print()
+    assert text2 == output

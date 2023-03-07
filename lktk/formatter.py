@@ -77,10 +77,10 @@ class LkmlFormatter:
 ]"""
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
-        # TODO fmt code block itself
         lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])  # don't call self.fmt which remove WS
+        value = dummy_fmt(value)  # TODO fmt code block itself
         lines = value.splitlines()
         if len(lines) == 1:
             return f"{lcomments}{key}: {value} ;;"
@@ -198,3 +198,8 @@ def token(token: Token | ParseTree) -> Token:
     if isinstance(token, Token):
         return token
     raise Exception()
+
+
+def dummy_fmt(code: str) -> str:
+    lines = code.splitlines()
+    return "\n".join(map(lambda s: s.strip(), lines))
