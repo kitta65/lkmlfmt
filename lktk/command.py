@@ -1,9 +1,9 @@
+import argparse
 from dataclasses import dataclass
 from pathlib import Path
-import argparse
 
-from lktk.parser import parse
 from lktk.formatter import LkmlFormatter
+from lktk.parser import parse
 
 
 @dataclass

@@ -1,13 +1,13 @@
+import re
 from contextlib import contextmanager
 from typing import Generator
-import re
 
 from lark import ParseTree, Token
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 INDENT_WIDTH = 2
 WS = re.compile(r"\s")
-COMMENT = re.compile(fr"{COMMENT_MARKER}")
+COMMENT = re.compile(rf"{COMMENT_MARKER}")
 
 
 class LkmlFormatter:
@@ -114,9 +114,9 @@ class LkmlFormatter:
         lines = []
         for line in lkml.splitlines():
             pieces = COMMENT.split(line)
-            main = ''.join(pieces[0::2])
-            tcomments = ' '.join(pieces[1::2])
-            if tcomments == '':
+            main = "".join(pieces[0::2])
+            tcomments = " ".join(pieces[1::2])
+            if tcomments == "":
                 lines.append(f"{main}")
             else:
                 lines.append(f"{main} {tcomments}")

@@ -1,7 +1,7 @@
 import pytest
 
-from lktk.parser import lkml_parser, comments
 from lktk.formatter import LkmlFormatter
+from lktk.parser import comments, lkml_parser
 
 
 @pytest.mark.parametrize(
@@ -146,13 +146,16 @@ key: [
         ),
         # trailing comments
         ("key: value # comment", "key: value # comment"),
-        ("""\
+        (
+            """\
 key: { # comment
   key: pair
-}""", """\
+}""",
+            """\
 key: { # comment
   key: pair
-}"""),
+}""",
+        ),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:
