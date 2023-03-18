@@ -11,15 +11,20 @@ jobs:
       - id: get
         run: |
           curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
-          releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
+          releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry[:5] | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
           echo ${releases}
           echo releases=${releases} >> $GITHUB_OUTPUT
 
   create-issues:
     needs: get-releases
     runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     steps:
+      # https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
       - run: |
-          for item in $(echo '${{ needs.get-releases.outputs.releases }}' | jq -c '.[]'); do
-            echo $item
+          echo '${{ needs.get-releases.outputs.releases }}' |
+          jq -c '.[]' |
+          while read -r release; do
+            title=$(echo $release | jq -c '.title')
           done
