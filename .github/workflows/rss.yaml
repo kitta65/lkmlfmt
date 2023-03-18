@@ -32,8 +32,8 @@ jobs:
           echo '${{ needs.get-releases.outputs.releases }}' |
           jq -c '.[]' |
           while read -r release; do
-            title=$(echo $release | jq -r -c '.title')
-            link=$(echo $release | jq -r -c '.link')
+            title=$(echo $release | jq -c '.title' | sed 's/[[:space:]]//g')
+            link=$(echo $release | jq -c '.link')
             echo $title $link
             len=$(gh search issues --match title --repo $GITHUB_REPOSITORY $title | wc -l)
             if (( $len == 0 )); then
