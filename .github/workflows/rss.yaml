@@ -18,4 +18,4 @@ jobs:
     needs: check-release-notes
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ needs.check-release-notes.releases }}
+      - run: echo ${{ needs.check-release-notes.outputs.releases }}
