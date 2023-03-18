@@ -16,6 +16,6 @@ jobs:
 
   create-issue:
     needs: check-release-notes
-    runs-on: utuntu-latest
+    runs-on: ubuntu-latest
     steps:
       - run: echo ${{ needs.check-release-notes.releases }}
