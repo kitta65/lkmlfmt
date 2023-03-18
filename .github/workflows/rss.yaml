@@ -1,5 +1,8 @@
 name: rss
-on: [push]
+on:
+  schedule:
+    # 17:00 Asia/Tokyo
+    - cron: "0 8 * * *"
 permissions:
   issues: write
 
