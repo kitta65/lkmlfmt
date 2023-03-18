@@ -109,6 +109,7 @@ class LkmlFormatter:
 }}"""
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
+        # TODO sort include
         lkml = self.fmt(lookml.children)
         while 0 < len(self.comments):
             lkml += f"\n{str(self.comments.pop(0).value).rstrip()}"
