@@ -1,0 +1,10 @@
+name: rss
+on: [push]
+jobs:
+  main:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
+          cat gcp-release-notes.xml | xq -c '.feed.entry | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})'
+
