@@ -23,9 +23,6 @@ jobs:
     steps:
       # https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
       - run: |
-          label=rss
-          gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
-
           echo '${{ needs.get-releases.outputs.releases }}' |
           jq -c '.[]' |
           while read -r release; do
@@ -33,6 +30,7 @@ jobs:
             link=$(echo $release | jq -c '.link')
             len=$(gh search issues --match title --repo $GITHUB_REPOSITORY "'$title'" | wc -l)
             if (( $len == 0 )); then
-              gh issue create --label $label --repo $GITHUB_REPOSITORY --title "'$title'" --body "'$link'"
+              # you have to create rss label before this action runs
+              gh issue create --label rss --repo $GITHUB_REPOSITORY --title "'$title'" --body "'$link'"
             fi
           done
