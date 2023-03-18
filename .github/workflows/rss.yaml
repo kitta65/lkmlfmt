@@ -20,6 +20,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          for item in $(echo ${{ needs.get-releases.outputs.releases }} | jq -c '.[]'); do
+          for item in $(echo '${{ needs.get-releases.outputs.releases }}' | jq -c '.[]'); do
             echo $item
           done
