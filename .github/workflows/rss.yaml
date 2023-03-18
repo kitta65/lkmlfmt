@@ -13,10 +13,13 @@ jobs:
           curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
           releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
           echo ${releases}
-          echo "releases='${releases}'" >> $GITHUB_OUTPUT
+          echo releases=${releases} >> $GITHUB_OUTPUT
 
-  create-issue:
+  create-issues:
     needs: get-releases
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ needs.get-releases.outputs.releases }}
+      - run: |
+          for item in $(echo ${{ needs.get-releases.outputs.releases }} | jq -c '.[]'); do
+            echo $item
+          done
