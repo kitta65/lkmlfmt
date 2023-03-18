@@ -58,11 +58,26 @@ sql:
 ;;""",
         ),
         (
-            """view: ident { derived_table: {sql: select 1;;} }""",
+            """view: ident { derived_table: { sql: select   1   ;; } }""",
             """\
 view: ident {
   derived_table: {
-    sql: this is derived_table sql!! ;;
+    sql: select 1 ;;
+  }
+}""",
+        ),
+        (
+            """view: ident { derived_table: { sql:
+-- comment
+select 1
+;; } }""",
+            """\
+view: ident {
+  derived_table: {
+    sql:
+      -- comment
+      select 1
+    ;;
   }
 }""",
         ),

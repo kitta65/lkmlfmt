@@ -3,11 +3,13 @@ from contextlib import contextmanager
 from typing import Generator
 
 from lark import ParseTree, Token
+from sqlfmt import api
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
+COMMENT = re.compile(rf"{COMMENT_MARKER}")
 INDENT_WIDTH = 2
 WS = re.compile(r"\s")
-COMMENT = re.compile(rf"{COMMENT_MARKER}")
+MODE = api.Mode()
 
 
 class LkmlFormatter:
@@ -81,7 +83,7 @@ class LkmlFormatter:
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])  # don't call self.fmt which remove WS
         if is_derived_table_sql(pair):
-            value = "this is derived_table sql!!"
+            value = api.format_string(value, mode=MODE).rstrip()
         else:
             value = dummy_fmt(value)  # TODO fmt code snippet
         lines = value.splitlines()
