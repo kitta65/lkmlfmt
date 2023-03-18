@@ -1,24 +1,22 @@
 name: rss
 on: [push]
 jobs:
-  check-release-notes:
+  get-releases:
     runs-on: ubuntu-latest
     container:
       image: alpine/xml:latest
+    outputs:
+      releases: ${{ steps.get.outputs.releases }}
     steps:
-      - id: check
+      - id: get
         run: |
           curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
           releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
           echo ${releases}
           echo "releases='${releases}'" >> $GITHUB_OUTPUT
-          cat $GITHUB_OUTPUT
-      - run: echo ${{ steps.check.outputs.releases }}
-    outputs:
-      releases: ${{ steps.check.releases }}
 
   create-issue:
-    needs: check-release-notes
+    needs: get-releases
     runs-on: ubuntu-latest
     steps:
-      - run: echo ${{ needs.check-release-notes.outputs.releases }}
+      - run: echo ${{ needs.get-releases.outputs.releases }}
