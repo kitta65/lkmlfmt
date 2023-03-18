@@ -35,7 +35,7 @@ jobs:
           while read -r release; do
             title=$(echo $release | jq -c -r '.title')
             link=$(echo $release | jq -c -r '.link')
-            if grep "$title" issues.txt; then
+            if grep "$title" issues.txt > /dev/null; then
               echo skipping "$title"
             else
               gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
