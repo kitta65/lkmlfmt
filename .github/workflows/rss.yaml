@@ -28,16 +28,16 @@ jobs:
       - run: |
           label=rss
           gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
+          gh search issues --match title --repo $GITHUB_REPOSITORY --label $label --sort created --order desc --limit 50 > issues.txt
 
           echo '${{ needs.get-releases.outputs.releases }}' |
           jq -c '.[]' |
           while read -r release; do
             title=$(echo $release | jq -c -r '.title')
             link=$(echo $release | jq -c -r '.link')
-            len=$(gh search issues --match title --repo $GITHUB_REPOSITORY "$title" | wc -l)
-            if (( $len == 0 )); then
-              gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
-            else
+            if grep "$title" issues.txt > /dev/null; then
               echo skipping "$title"
+            else
+              gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
             fi
           done
