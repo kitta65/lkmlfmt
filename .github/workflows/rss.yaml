@@ -1,0 +1,43 @@
+name: rss
+on: [push]
+permissions:
+  issues: write
+
+jobs:
+  get-releases:
+    runs-on: ubuntu-latest
+    container:
+      image: alpine/xml:latest
+    outputs:
+      releases: ${{ steps.get.outputs.releases }}
+    steps:
+      - id: get
+        run: |
+          curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
+          releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry[:50] | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
+          echo ${releases}
+          echo releases=${releases} >> $GITHUB_OUTPUT
+
+  create-issues:
+    needs: get-releases
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      # https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
+      - run: |
+          label=rss
+          gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
+
+          echo '${{ needs.get-releases.outputs.releases }}' |
+          jq -c '.[]' |
+          while read -r release; do
+            title=$(echo $release | jq -c -r '.title')
+            link=$(echo $release | jq -c -r '.link')
+            len=$(gh search issues --match title --repo $GITHUB_REPOSITORY "$title" | wc -l)
+            if (( $len == 0 )); then
+              gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
+            else
+              echo skipping "$title"
+            fi
+          done
