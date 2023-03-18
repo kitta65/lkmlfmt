@@ -1,3 +1,4 @@
+import weakref
 from pathlib import Path
 
 from lark import Lark, ParseTree, Token, Tree, Visitor
@@ -22,7 +23,7 @@ class ParentSetter(Visitor[Token]):  # Visitor[Token] means Visitor of ParseTree
     def __default__(self, tree: ParseTree) -> None:
         for child in tree.children:
             if isinstance(child, Tree):
-                child._parent = tree  # type: ignore
+                child._parent = weakref.ref(tree)  # type: ignore
 
 
 # NOTE don't execute this function asynchronously

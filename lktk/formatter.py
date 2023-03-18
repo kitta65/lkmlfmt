@@ -219,12 +219,12 @@ def is_derived_table_sql(tree: ParseTree) -> bool:
     } }
     """
     try:
-        value_dtable: ParseTree = tree._parent  # type: ignore
-        vpair_dtable: ParseTree = value_dtable._parent  # type: ignore
-        value_view_inner: ParseTree = vpair_dtable._parent  # type: ignore
-        value_view_outer: ParseTree = value_view_inner._parent  # type: ignore
-        vpair_view: ParseTree = value_view_outer._parent  # type: ignore
-        lkml: ParseTree = vpair_view._parent  # type: ignore
+        value_dtable: ParseTree = tree._parent()  # type: ignore
+        vpair_dtable: ParseTree = value_dtable._parent()  # type: ignore
+        value_view_inner: ParseTree = vpair_dtable._parent()  # type: ignore
+        value_view_outer: ParseTree = value_view_inner._parent()  # type: ignore
+        vpair_view: ParseTree = value_view_outer._parent()  # type: ignore
+        lkml: ParseTree = vpair_view._parent()  # type: ignore
     except AttributeError:
         return False
 
