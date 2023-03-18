@@ -31,11 +31,11 @@ def run() -> None:
 
     match args.subcmd:
         case "parse":
-            tree, comments = parse(args.filepath)
+            tree, comments = parse(args.filepath.read_text())
             print(tree.pretty())
             print(comments)
-        case "fmt":
-            tree, comments = parse(args.filepath)
+        case "format" | "fmt":
+            tree, comments = parse(args.filepath.read_text(), set_parent=True)
             formatter = LkmlFormatter(tree, comments)
             formatter.print()
         case _:

@@ -80,7 +80,10 @@ class LkmlFormatter:
         lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])  # don't call self.fmt which remove WS
-        value = dummy_fmt(value)  # TODO fmt code block itself
+        if is_derived_table_sql(pair):
+            value = "this is derived_table sql!!"
+        else:
+            value = dummy_fmt(value)  # TODO fmt code snippet
         lines = value.splitlines()
         if len(lines) == 1:
             return f"{lcomments}{key}: {value} ;;"
@@ -204,3 +207,31 @@ def token(token: Token | ParseTree) -> Token:
 def dummy_fmt(code: str) -> str:
     lines = code.splitlines()
     return "\n".join(map(lambda s: s.strip(), lines))
+
+
+def is_derived_table_sql(tree: ParseTree) -> bool:
+    """
+    view: ident { derived_table: {
+        sql: select 1;;  # detect this code pair!
+    } }
+    """
+    try:
+        value_dtable: ParseTree = tree._parent  # type: ignore
+        vpair_dtable: ParseTree = value_dtable._parent  # type: ignore
+        value_view_inner: ParseTree = vpair_dtable._parent  # type: ignore
+        value_view_outer: ParseTree = value_view_inner._parent  # type: ignore
+        vpair_view: ParseTree = value_view_outer._parent  # type: ignore
+        lkml: ParseTree = vpair_view._parent  # type: ignore
+    except AttributeError:
+        return False
+
+    if hasattr(lkml, "_parent"):
+        return False
+
+    if str(vpair_view.children[0]) != "view":
+        return False
+
+    if str(vpair_dtable.children[0]) != "derived_table":
+        return False
+
+    return True
