@@ -1,7 +1,7 @@
 import pytest
 
-from lktk.parser import lkml_parser, comments
 from lktk.formatter import LkmlFormatter
+from lktk.parser import parse
 
 
 @pytest.mark.parametrize(
@@ -56,6 +56,30 @@ sql:
   code
   block
 ;;""",
+        ),
+        (
+            """view: ident { derived_table: { sql: select   1   ;; } }""",
+            """\
+view: ident {
+  derived_table: {
+    sql: select 1 ;;
+  }
+}""",
+        ),
+        (
+            """view: ident { derived_table: { sql:
+-- comment
+select 1
+;; } }""",
+            """\
+view: ident {
+  derived_table: {
+    sql:
+      -- comment
+      select 1
+    ;;
+  }
+}""",
         ),
         # dict
         (
@@ -146,22 +170,25 @@ key: [
         ),
         # trailing comments
         ("key: value # comment", "key: value # comment"),
-        ("""\
+        (
+            """\
 key: { # comment
   key: pair
-}""", """\
+}""",
+            """\
 key: { # comment
   key: pair
-}"""),
+}""",
+        ),
     ],
 )
 def test_formatter(input_: str, output: str) -> None:
     # once formatted text matches expected output
-    tree1 = lkml_parser.parse(input_)
+    tree1, comments = parse(input_, set_parent=True)
     text1 = LkmlFormatter(tree1, comments).print()
     assert text1 == output
 
     # twice formatted text also matches expected output
-    tree2 = lkml_parser.parse(text1)
+    tree2, comments = parse(text1, set_parent=True)
     text2 = LkmlFormatter(tree2, comments).print()
     assert text2 == output

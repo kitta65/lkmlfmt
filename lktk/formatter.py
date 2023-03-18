@@ -1,13 +1,15 @@
+import re
 from contextlib import contextmanager
 from typing import Generator
-import re
 
 from lark import ParseTree, Token
+from sqlfmt import api
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
+COMMENT = re.compile(rf"{COMMENT_MARKER}")
 INDENT_WIDTH = 2
 WS = re.compile(r"\s")
-COMMENT = re.compile(fr"{COMMENT_MARKER}")
+MODE = api.Mode()
 
 
 class LkmlFormatter:
@@ -80,7 +82,10 @@ class LkmlFormatter:
         lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])  # don't call self.fmt which remove WS
-        value = dummy_fmt(value)  # TODO fmt code block itself
+        if is_derived_table_sql(pair):
+            value = api.format_string(value, mode=MODE).rstrip()
+        else:
+            value = dummy_fmt(value)  # TODO fmt code snippet
         lines = value.splitlines()
         if len(lines) == 1:
             return f"{lcomments}{key}: {value} ;;"
@@ -106,6 +111,7 @@ class LkmlFormatter:
 }}"""
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
+        # TODO sort include
         lkml = self.fmt(lookml.children)
         while 0 < len(self.comments):
             lkml += f"\n{str(self.comments.pop(0).value).rstrip()}"
@@ -114,9 +120,9 @@ class LkmlFormatter:
         lines = []
         for line in lkml.splitlines():
             pieces = COMMENT.split(line)
-            main = ''.join(pieces[0::2])
-            tcomments = ' '.join(pieces[1::2])
-            if tcomments == '':
+            main = "".join(pieces[0::2])
+            tcomments = " ".join(pieces[1::2])
+            if tcomments == "":
                 lines.append(f"{main}")
             else:
                 lines.append(f"{main} {tcomments}")
@@ -204,3 +210,31 @@ def token(token: Token | ParseTree) -> Token:
 def dummy_fmt(code: str) -> str:
     lines = code.splitlines()
     return "\n".join(map(lambda s: s.strip(), lines))
+
+
+def is_derived_table_sql(tree: ParseTree) -> bool:
+    """
+    view: ident { derived_table: {
+        sql: select 1;;  # detect this code pair!
+    } }
+    """
+    try:
+        value_dtable: ParseTree = tree._parent  # type: ignore
+        vpair_dtable: ParseTree = value_dtable._parent  # type: ignore
+        value_view_inner: ParseTree = vpair_dtable._parent  # type: ignore
+        value_view_outer: ParseTree = value_view_inner._parent  # type: ignore
+        vpair_view: ParseTree = value_view_outer._parent  # type: ignore
+        lkml: ParseTree = vpair_view._parent  # type: ignore
+    except AttributeError:
+        return False
+
+    if hasattr(lkml, "_parent"):
+        return False
+
+    if str(vpair_view.children[0]) != "view":
+        return False
+
+    if str(vpair_dtable.children[0]) != "derived_table":
+        return False
+
+    return True

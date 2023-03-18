@@ -1,9 +1,9 @@
+import argparse
 from dataclasses import dataclass
 from pathlib import Path
-import argparse
 
-from lktk.parser import parse
 from lktk.formatter import LkmlFormatter
+from lktk.parser import parse
 
 
 @dataclass
@@ -31,11 +31,11 @@ def run() -> None:
 
     match args.subcmd:
         case "parse":
-            tree, comments = parse(args.filepath)
+            tree, comments = parse(args.filepath.read_text())
             print(tree.pretty())
             print(comments)
-        case "fmt":
-            tree, comments = parse(args.filepath)
+        case "format" | "fmt":
+            tree, comments = parse(args.filepath.read_text(), set_parent=True)
             formatter = LkmlFormatter(tree, comments)
             formatter.print()
         case _:
