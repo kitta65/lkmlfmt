@@ -12,6 +12,8 @@ jobs:
           releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
           echo ${releases}
           echo "releases='${releases}'" >> $GITHUB_OUTPUT
+          cat $GITHUB_OUTPUT
+      - run: echo ${{ steps.check.outputs.releases }}
     outputs:
       releases: ${{ steps.check.releases }}
 
