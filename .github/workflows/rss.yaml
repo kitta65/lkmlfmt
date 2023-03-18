@@ -3,6 +3,8 @@ on: [push]
 jobs:
   main:
     runs-on: ubuntu-latest
+    container:
+      image: alpine/xml:latest
     steps:
       - run: |
           curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
