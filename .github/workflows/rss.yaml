@@ -10,7 +10,7 @@ jobs:
         run: |
           curl -O https://cloud.google.com/feeds/gcp-release-notes.xml
           releases=$(cat gcp-release-notes.xml | xq -c '.feed.entry | map(select(.content."#text" | ascii_upcase | contains("LOOKER"))) | map({title: .title, link: .link."@href"})')
-          echo "releases='${releases}'" >> $GITHUB_OUTPUT
+          echo "releases=aaa" >> $GITHUB_OUTPUT
     outputs:
       releases: ${{ steps.check.releases }}
 
