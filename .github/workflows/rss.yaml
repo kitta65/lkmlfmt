@@ -27,8 +27,9 @@ jobs:
           jq -c '.[]' |
           while read -r release; do
             title=$(echo $release | jq -c '.title')
-            len=$(gh search issues --match title --repo $GITHUB_REPOSITORY "'$title'" | wc -l)
-            if (( $len == 0 ));then
-              echo 'create issue'
+            link=$(echo $release | jq -c '.link')
+            len=$(gh search issues --match title --repo $GITHUB_REPOSITORY $title | wc -l)
+            if (( $len == 0 )); then
+              gh issue create --label rss --repo $GITHUB_REPOSITORY --title $title --body $link
             fi
           done
