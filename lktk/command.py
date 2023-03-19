@@ -1,42 +1,39 @@
-import argparse
-from dataclasses import dataclass
+import logging
+
+# from dataclasses import dataclass
 from pathlib import Path
 
-from lktk.formatter import LkmlFormatter
-from lktk.parser import parse
+import click
+
+# from lktk.formatter import LkmlFormatter
+# from lktk.parser import parse
 
 
-@dataclass
-class Args:
-    subcmd: str
-    filepath: Path
+@click.group()
+@click.option(
+    "--log-level",
+    type=click.Choice(
+        ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False
+    ),
+    default="DEBUG",
+)
+def run(log_level: str) -> None:
+    level = getattr(logging, log_level)
+    logging.basicConfig(level=level)
 
 
-def parse_args() -> Args:
-    parser = argparse.ArgumentParser(
-        prog="Looker Toolkit", description="unofficial looker CLI"
-    )
-    parser.add_argument("subcmd")
-    parser.add_argument("filepath", type=Path)
-    args = parser.parse_args()
+# TODO enable alias `fmt`
+@click.command()
+@click.option("--check", is_flag=True, help="TODO add help message")
+@click.option("--diff", is_flag=True, help="TODO add help message")
+@click.argument("files", type=click.Path(exists=True), nargs=-1)
+def format(check: bool, diff: bool, files: list[Path]) -> None:
+    if check:
+        click.echo("check")
+    if diff:
+        click.echo("diff")
+    for f in files:
+        click.echo(click.format_filename(f))
 
-    return Args(
-        subcmd=args.subcmd,
-        filepath=args.filepath,
-    )
 
-
-def run() -> None:
-    args = parse_args()
-
-    match args.subcmd:
-        case "parse":
-            tree, comments = parse(args.filepath.read_text())
-            print(tree.pretty())
-            print(comments)
-        case "format" | "fmt":
-            tree, comments = parse(args.filepath.read_text(), set_parent=True)
-            formatter = LkmlFormatter(tree, comments)
-            formatter.print()
-        case _:
-            print(f"invalid subcmd: {args.subcmd}")
+run.add_command(format)
