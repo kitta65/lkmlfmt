@@ -10,9 +10,6 @@ from lktk.formatter import LkmlFormatter
 from lktk.logger import logger
 from lktk.parser import parse
 
-# from lktk.formatter import LkmlFormatter
-# from lktk.parser import parse
-
 
 @click.group()
 @click.option(
@@ -27,7 +24,6 @@ def run(log_level: str) -> None:
     logging.basicConfig(level=level)
 
 
-# TODO enable alias `fmt`
 @click.command()
 @click.option("--check", is_flag=True, help="TODO add help message")
 @click.option("--diff", is_flag=True, help="TODO add help message")
