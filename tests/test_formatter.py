@@ -51,11 +51,7 @@ key2: value*""",
             """\
 sql: code
 block ;;""",
-            """\
-sql:
-  code
-  block
-;;""",
+            """sql: code block ;;""",
         ),
         (
             """view: ident { derived_table: { sql: select   1   ;; } }""",
