@@ -25,10 +25,13 @@ def run(log_level: str) -> None:
 
 
 @click.command()
-@click.option("--check", is_flag=True, help="TODO add help message")
-@click.option("--diff", is_flag=True, help="TODO add help message")
+@click.option(
+    "--check",
+    is_flag=True,
+    help="Don't update files. Instead, exit with status code 1 if any file should be modefied.",
+)
 @click.argument("files", type=click.Path(exists=True, path_type=Path), nargs=-1)
-def format(check: bool, diff: bool, files: list[Path]) -> None:
+def format(check: bool, files: list[Path]) -> None:
     modified: list[bool] = []
 
     for file in filter_lkml(files):
@@ -44,10 +47,9 @@ def format(check: bool, diff: bool, files: list[Path]) -> None:
             click.echo(f"{file} is skipped")
             modified.append(False)
 
-        if diff:
+        if check:
             print_diff(before, after)
-
-        if not check:
+        else:
             with open(file, "w") as f:
                 f.write(after)
 
