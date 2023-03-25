@@ -18,11 +18,6 @@ class LkmlFormatter:
         self.comments = comments
         self.curr_indent = 0
 
-    def print(self) -> str:
-        text = self.fmt()
-        print(text)
-        return text
-
     # NOTE
     # parents take care of indentation of the children
     # parents take care of separator of the children
