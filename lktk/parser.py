@@ -18,6 +18,7 @@ with open(DIR / "lkml.lark") as f:
     )
 
 
+# TODO remove if not needed
 # https://lark-parser.readthedocs.io/en/latest/recipes.html#keeping-track-of-parents-when-visiting
 class ParentSetter(Visitor[Token]):  # Visitor[Token] means Visitor of ParseTree
     def __default__(self, tree: ParseTree) -> None:
