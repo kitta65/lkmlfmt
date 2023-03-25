@@ -185,10 +185,10 @@ key: { # comment
 def test_formatter(input_: str, output: str) -> None:
     # once formatted text matches expected output
     tree1, comments = parse(input_, set_parent=True)
-    text1 = LkmlFormatter(tree1, comments).print()
+    text1 = LkmlFormatter(tree1, comments).fmt()
     assert text1 == output
 
     # twice formatted text also matches expected output
     tree2, comments = parse(text1, set_parent=True)
-    text2 = LkmlFormatter(tree2, comments).print()
+    text2 = LkmlFormatter(tree2, comments).fmt()
     assert text2 == output

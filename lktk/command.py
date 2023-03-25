@@ -35,24 +35,24 @@ def run(log_level: str) -> None:
 def format(check: bool, diff: bool, files: list[Path]) -> None:
     modified: list[bool] = []
 
-    for f in filter_lkml(files):
-        logger.debug(f"formatting {f}")
-        before = f.read_text()
+    for file in filter_lkml(files):
+        logger.debug(f"formatting {file}")
+        before = file.read_text()
         tree, comment = parse(before, set_parent=True)
         after = LkmlFormatter(tree, comment).fmt()
 
         if before != after:
-            click.echo(f"{f} is modified")
+            click.echo(f"{file} is modified")
             modified.append(True)
         else:
-            click.echo(f"{f} is skipped")
+            click.echo(f"{file} is skipped")
             modified.append(False)
 
         if diff:
             print_diff(before, after)
 
         if not check:
-            with open(f, "w") as f:
+            with open(file, "w") as f:
                 f.write(after)
 
     n_modified = sum(modified)
