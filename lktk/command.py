@@ -53,7 +53,8 @@ def format(check: bool, files: list[Path]) -> None:
             with open(file, "w") as f:
                 f.write(after)
 
-    n_modified = sum(modified)
+    # https://stackoverflow.com/questions/12765833/counting-the-number-of-true-booleans-in-a-python-list
+    n_modified = modified.count(True)
     n_skipped = len(modified) - n_modified
     click.echo(f"{n_modified} files are modified, {n_skipped} files are skipped.")
 
