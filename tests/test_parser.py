@@ -91,6 +91,16 @@ from lktk.parser import lkml_parser
 """,
         ),
         (
+            'values: ["value1", "value2",]',
+            """lkml
+    value_pair
+        values
+        arr
+            "value1"
+            "value2"
+""",
+        ),
+        (
             'always_filter: [viewname.fieldname: "condition"]',
             """lkml
     value_pair

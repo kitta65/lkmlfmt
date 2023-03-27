@@ -4,7 +4,7 @@ value_pair: IDENT ":" value
 ?pair: code_pair | value_pair
 dict: "{" pair* "}"
 named_dict: IDENT dict
-arr: "[" [(value | pair) ("," (value | pair))*] "]"
+arr: "[" [(value | pair) ("," (value | pair))* [","]] "]"
 ?value: arr
       | dict
       | named_dict
