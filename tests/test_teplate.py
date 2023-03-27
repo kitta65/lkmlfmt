@@ -18,11 +18,13 @@ from lktk.template import to_jinja
             """\
 select
 {% if foo == 'bar' %} 1
-{% else %} 2""",
+{% else %} 2
+{% endif %}""",
             """\
 select
-{% set lktk = 1 %}{% if %}{% set lktk = 1 %} 1
-{% set lktk = 2 %}{% else %}{% set lktk = 2 %} 2""",
+{% set lktk = 1 %}{% if True %}{% set lktk = 1 %} 1
+{% set lktk = 2 %}{% else %}{% set lktk = 2 %} 2
+{% set lktk = 3 %}{% endif %}{% set lktk = 3 %}""",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),

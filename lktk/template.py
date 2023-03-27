@@ -26,9 +26,36 @@ def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
         leading = sql[: match.start()]
         trailing = sql[match.end() :]
         liquid = match.group(0)
-        statement = match.group(1)
+        match type_ := match.group(1):
+            # control flow
+            case "if":
+                jinja = "{% if True %}"
+            case "elsif":
+                jinja = "{% elif True %}"
+            case "unless":
+                jinja = "{% if True %}"
+            case "endunless":
+                jinja = "{% endif %}"
+            case "case":
+                jinja = "{% if True %}"
+            case "when":
+                jinja = "{% elif True %}"
+            case "endcase":
+                jinja = "{% endif %}"
+            # iteration
+            case "for":
+                jinja = "{% for i in [] %}"
+            case "cycle":
+                jinja = "{{ var }}"
+            case "tablerow":
+                jinja = "{% for i in [] %}"
+            case "endtablerow":
+                jinja = "{% endfor %}"
+            # template
+            case _:
+                jinja = f"{{% {type_} %}}"
         marker = LIQUID_MARKER.format(id_)
-        processed += f"{leading}{marker}{{% {statement} %}}{marker}"
+        processed += f"{leading}{marker}{jinja}{marker}"
         sql = trailing
         liquids.append(LiquidTempate(liquid, id_))
 
