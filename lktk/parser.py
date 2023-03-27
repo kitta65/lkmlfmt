@@ -8,14 +8,13 @@ DIR = Path(__file__).parent
 
 comments: list[Token] = []
 
-with open(DIR / "lkml.lark") as f:
-    lkml_parser = Lark(
-        f.read(),
-        start="lkml",
-        # https://lark-parser.readthedocs.io/en/latest/json_tutorial.html#step-2-lalr-1
-        parser="lalr",
-        lexer_callbacks={"COMMENT": comments.append},
-    )
+lkml_parser = Lark(
+    (DIR / "lkml.lark").read_text(),
+    start="lkml",
+    # https://lark-parser.readthedocs.io/en/latest/json_tutorial.html#step-2-lalr-1
+    parser="lalr",
+    lexer_callbacks={"COMMENT": comments.append},
+)
 
 
 # TODO remove if not needed
