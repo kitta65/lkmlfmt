@@ -32,6 +32,7 @@ jobs:
       - run: |
           label=rss
           gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
+          sleep 3
           gh search issues --match title --repo $GITHUB_REPOSITORY --label $label --sort created --order desc --limit 50 > issues.txt
           cat issues.txt
 
@@ -43,6 +44,7 @@ jobs:
             if grep "$title" issues.txt > /dev/null; then
               echo skipping "$title"
             else
+              sleep 3
               gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
             fi
           done
