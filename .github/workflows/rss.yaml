@@ -3,7 +3,6 @@ on:
   schedule:
     # 17:00 Asia/Tokyo
     - cron: "0 8 * * *"
-  workflow_dispatch:
 permissions:
   issues: write
 
@@ -27,12 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
+      SLEEP_SEC: 3
     steps:
       # https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
       - run: |
           label=rss
           gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
-          sleep 3
+          sleep $SLEEP_SEC
           gh search issues --match title --repo $GITHUB_REPOSITORY --label $label --sort created --order desc --limit 50 > issues.txt
           cat issues.txt
 
@@ -44,7 +45,7 @@ jobs:
             if grep "$title" issues.txt > /dev/null; then
               echo skipping "$title"
             else
-              sleep 3
+              sleep $SLEEP_SEC
               gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
             fi
           done
