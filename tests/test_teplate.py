@@ -26,6 +26,16 @@ select
 {% set lktk = 2 %}{% else %}{% set lktk = 2 %} 2
 {% set lktk = 3 %}{% endif %}{% set lktk = 3 %}""",
         ),
+        # multiline
+        (
+            """\
+select {%
+  liquid
+  assign x = "x"
+  echo x
+%}""",
+            "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %}",
+        ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
 )

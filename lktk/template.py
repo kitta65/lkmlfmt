@@ -11,7 +11,6 @@ class LiquidTempate:
     id: int  # 1-based
 
 
-# TODO consider multiline tag
 def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
     processed = ""
     liquids: list[LiquidTempate] = []
@@ -27,7 +26,6 @@ def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
         leading = sql[: match.start()]
         trailing = sql[match.end() :]
         liquid = match.group(0)
-        # NOTE which is better `/*` `*/` or `{{"""` `"""}}`?
         match type_ := match.group(1):
             # control flow
             case "if":
@@ -61,20 +59,21 @@ def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
             case "liquid":
                 jinja = "{% set x = 'x' %}"
             case "raw":
-                jinja = "/*"
+                jinja = "/*"  # or {{"""
             case "endraw":
-                jinja = "*/"
+                jinja = "*/"  # or """}}
             case "render" | "include":
                 jinja = "{% set x = 'x' %}"
             # variable
             case "assign":
                 jinja = "{% set x = 'x' %}"
             case "capture":
-                jinja = "/*"
+                jinja = "/*"  # or {{"""
             case "endcapture":
-                jinja = "*/"
+                jinja = "*/"  # or """}}
             case "increment" | "decrement":
                 jinja = "{{ var }}"
+            # default
             case _:
                 jinja = f"{{% {type_} %}}"
 
