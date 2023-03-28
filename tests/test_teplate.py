@@ -36,6 +36,20 @@ select {%
 %}""",
             "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %}",
         ),
+        # comment
+        (
+            "select {% # comment %} 1",
+            "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %} 1",
+        ),
+        (
+            """\
+select {%
+  # this
+  # is
+  # comment
+%} 1""",
+            "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %} 1",
+        ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
 )

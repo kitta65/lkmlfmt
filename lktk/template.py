@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 
 LIQUID_MARKER = "{{% set lktk = {} %}}"
-TAG = re.compile(r"""\{%-?\s*([a-z]*)([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\}""")
+TAG = re.compile(r"""\{%-?\s*(#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\}""")
 
 
 @dataclass
@@ -73,6 +73,9 @@ def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
                 jinja = "*/"  # or """}}
             case "increment" | "decrement":
                 jinja = "{{ var }}"
+            # comment
+            case "#":
+                jinja = "{% set x = 'x' %}"
             # default
             case _:
                 jinja = f"{{% {type_} %}}"
