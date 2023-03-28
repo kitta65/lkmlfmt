@@ -2,6 +2,7 @@ import pytest
 
 from lktk.formatter import LkmlFormatter
 from lktk.parser import parse
+from tests import utils
 
 
 @pytest.mark.parametrize(
@@ -177,6 +178,7 @@ key: { # comment
 }""",
         ),
     ],
+    ids=utils.shorten,
 )
 def test_formatter(input_: str, output: str) -> None:
     # once formatted text matches expected output

@@ -1,8 +1,7 @@
-import re
-
 import pytest
 
 from lktk.parser import lkml_parser
+from tests import utils
 
 
 @pytest.mark.parametrize(
@@ -218,7 +217,7 @@ from lktk.parser import lkml_parser
 """,
         ),
     ],
-    ids=lambda x: re.sub(r"\s+", " ", x),
+    ids=utils.shorten,
 )
 def test_parser(input_: str, output: str) -> None:
     tree = lkml_parser.parse(input_)

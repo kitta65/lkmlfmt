@@ -3,6 +3,7 @@ import re
 import pytest
 
 from lktk.template import to_jinja, to_liquid
+from tests import utils
 
 
 @pytest.mark.parametrize(
@@ -76,6 +77,7 @@ select
             ["{% if foo == 'bar' %}", "{% else %}", "{% endif %}"],
         ),
     ],
+    ids=utils.shorten,
 )
 def test_to_liquid(jinja: str, liquid: str, tags: list[str]) -> None:
     res = to_liquid(jinja, tags)
