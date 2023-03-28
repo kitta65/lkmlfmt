@@ -81,6 +81,9 @@ def to_jinja(sql: str) -> tuple[str, list[str]]:
     return processed, liquids
 
 
-def to_liquid(sql: str) -> str:
-    # TODO
-    return sql
+# TODO consider newline between markers
+def to_liquid(jinja: str, tags: list[str]) -> str:
+    for i, tag in enumerate(tags):
+        leading, _, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
+        jinja = leading + tag + trailing
+    return jinja
