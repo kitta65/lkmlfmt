@@ -22,9 +22,9 @@ select
 {% endif %}""",
             """\
 select
-{% set lktk = 1 %}{% if True %}{% set lktk = 1 %} 1
-{% set lktk = 2 %}{% else %}{% set lktk = 2 %} 2
-{% set lktk = 3 %}{% endif %}{% set lktk = 3 %}""",
+{% set lktk = 0 %}{% if True %}{% set lktk = 0 %} 1
+{% set lktk = 1 %}{% else %}{% set lktk = 1 %} 2
+{% set lktk = 2 %}{% endif %}{% set lktk = 2 %}""",
         ),
         # multiline
         (
@@ -34,12 +34,12 @@ select {%
   assign x = "x"
   echo x
 %}""",
-            "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %}",
+            "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %}",
         ),
         # comment
         (
             "select {% # comment %} 1",
-            "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %} 1",
+            "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %} 1",
         ),
         (
             """\
@@ -48,7 +48,7 @@ select {%
   # is
   # comment
 %} 1""",
-            "select {% set lktk = 1 %}{% set x = 'x' %}{% set lktk = 1 %} 1",
+            "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %} 1",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),

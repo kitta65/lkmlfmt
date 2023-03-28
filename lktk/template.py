@@ -1,23 +1,15 @@
 import re
-from dataclasses import dataclass
 
 LIQUID_MARKER = "{{% set lktk = {} %}}"
 TAG = re.compile(r"""\{%-?\s*(#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\}""")
 
 
-@dataclass
-class LiquidTempate:
-    liquid: str
-    id: int  # 1-based
-
-
-def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
+def to_jinja(sql: str) -> tuple[str, list[str]]:
     processed = ""
-    liquids: list[LiquidTempate] = []
+    liquids = []
     id_ = 0
 
     while True:
-        id_ += 1
         match = TAG.search(sql)
         if match is None:
             processed += sql
@@ -83,7 +75,8 @@ def to_jinja(sql: str) -> tuple[str, list[LiquidTempate]]:
         marker = LIQUID_MARKER.format(id_)
         processed += f"{leading}{marker}{jinja}{marker}"
         sql = trailing
-        liquids.append(LiquidTempate(liquid, id_))
+        liquids.append(liquid)
+        id_ += 1
 
     return processed, liquids
 
