@@ -6,7 +6,7 @@ from lktk.template import to_jinja, to_liquid
 
 
 @pytest.mark.parametrize(
-    "input_,output",
+    "liquid,jinja",
     [
         # no tag
         (
@@ -53,9 +53,9 @@ select {%
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
 )
-def test_to_jinja(input_: str, output: str) -> None:
-    res, _ = to_jinja(input_)
-    assert res == output
+def test_to_jinja(liquid: str, jinja: str) -> None:
+    res, _ = to_jinja(liquid)
+    assert res == jinja
 
 
 @pytest.mark.parametrize(

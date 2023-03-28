@@ -4,81 +4,81 @@ LIQUID_MARKER = "{{% set lktk = {} %}}"
 TAG = re.compile(r"""\{%-?\s*(#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\}""")
 
 
-def to_jinja(sql: str) -> tuple[str, list[str]]:
-    processed = ""
-    liquids = []
+def to_jinja(liquid: str) -> tuple[str, list[str]]:
+    jinja = ""
+    tags = []
     id_ = 0
 
     while True:
-        match = TAG.search(sql)
+        match = TAG.search(liquid)
         if match is None:
-            processed += sql
+            jinja += liquid
             break
 
-        leading = sql[: match.start()]
-        trailing = sql[match.end() :]
-        liquid = match.group(0)
+        leading = liquid[: match.start()]
+        trailing = liquid[match.end() :]
+        tag = match.group(0)
         match type_ := match.group(1):
             # control flow
             case "if":
-                jinja = "{% if True %}"
+                dummy = "{% if True %}"
             case "elsif":
-                jinja = "{% elif True %}"
+                dummy = "{% elif True %}"
             case "unless":
-                jinja = "{% if True %}"
+                dummy = "{% if True %}"
             case "endunless":
-                jinja = "{% endif %}"
+                dummy = "{% endif %}"
             case "case":
-                jinja = "{% if True %}"
+                dummy = "{% if True %}"
             case "when":
-                jinja = "{% elif True %}"
+                dummy = "{% elif True %}"
             case "endcase":
-                jinja = "{% endif %}"
+                dummy = "{% endif %}"
             # iteration
             case "for":
-                jinja = "{% for i in [] %}"
+                dummy = "{% for i in [] %}"
             case "cycle":
-                jinja = "{{ var }}"
+                dummy = "{{ var }}"
             case "tablerow":
-                jinja = "{% for i in [] %}"
+                dummy = "{% for i in [] %}"
             case "endtablerow":
-                jinja = "{% endfor %}"
+                dummy = "{% endfor %}"
             # template
             case "comment":
-                jinja = "/*"
+                dummy = "/*"
             case "endcomment":
-                jinja = "*/"
+                dummy = "*/"
             case "liquid":
-                jinja = "{% set x = 'x' %}"
+                dummy = "{% set x = 'x' %}"
             case "raw":
-                jinja = "/*"  # or {{"""
+                dummy = "/*"  # or {{"""
             case "endraw":
-                jinja = "*/"  # or """}}
+                dummy = "*/"  # or """}}
             case "render" | "include":
-                jinja = "{% set x = 'x' %}"
+                dummy = "{% set x = 'x' %}"
             # variable
             case "assign":
-                jinja = "{% set x = 'x' %}"
+                dummy = "{% set x = 'x' %}"
             case "capture":
-                jinja = "/*"  # or {{"""
+                dummy = "/*"  # or {{"""
             case "endcapture":
-                jinja = "*/"  # or """}}
+                dummy = "*/"  # or """}}
             case "increment" | "decrement":
-                jinja = "{{ var }}"
+                dummy = "{{ var }}"
             # comment
             case "#":
-                jinja = "{% set x = 'x' %}"
+                dummy = "{% set x = 'x' %}"
             # default
             case _:
-                jinja = f"{{% {type_} %}}"
+                dummy = f"{{% {type_} %}}"
 
         marker = LIQUID_MARKER.format(id_)
-        processed += f"{leading}{marker}{jinja}{marker}"
-        sql = trailing
-        liquids.append(liquid)
+        jinja += f"{leading}{marker}{dummy}{marker}"
+        liquid = trailing
+        tags.append(tag)
         id_ += 1
 
-    return processed, liquids
+    return jinja, tags
 
 
 # TODO consider newline between markers
