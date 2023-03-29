@@ -27,7 +27,7 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       # https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
-      SLEEP_SEC: 3
+      SLEEP_SEC: 5
     steps:
       # https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
       - run: |
