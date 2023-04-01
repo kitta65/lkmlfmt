@@ -2,6 +2,7 @@ import pytest
 
 from lktk.formatter import LkmlFormatter
 from lktk.parser import parse
+from tests import utils
 
 
 @pytest.mark.parametrize(
@@ -41,41 +42,6 @@ key2: value*""",
   ],
   [ value5 ]
 ]""",
-        ),
-        # code block
-        (
-            """sql: code block ;;""",
-            """sql: code block ;;""",
-        ),
-        (
-            """\
-sql: code
-block ;;""",
-            """sql: code block ;;""",
-        ),
-        (
-            """view: ident { derived_table: { sql: select   1   ;; } }""",
-            """\
-view: ident {
-  derived_table: {
-    sql: select 1 ;;
-  }
-}""",
-        ),
-        (
-            """view: ident { derived_table: { sql:
--- comment
-select 1
-;; } }""",
-            """\
-view: ident {
-  derived_table: {
-    sql:
-      -- comment
-      select 1
-    ;;
-  }
-}""",
         ),
         # dict
         (
@@ -176,7 +142,69 @@ key: { # comment
   key: pair
 }""",
         ),
+        # sql
+        (
+            """\
+sql:     select     
+1     ;;""",  # noqa: W291
+            """sql: select 1 ;;""",
+        ),
+        (
+            """\
+sql:     1     
++     1     ;;""",  # noqa: W291
+            """sql: 1 + 1 ;;""",
+        ),
+        (
+            """\
+sql:
+-- comment
+select 1
+;;""",
+            """\
+sql:
+  -- comment
+  select 1
+;;""",
+        ),
+        (
+            """\
+sql:
+  with temp as (
+    select ts, col1, col2, col3
+    from
+      {% if ts_date._in_query %}${daily.SQL_TABLE_NAME}
+      {% elsif ts_week._in_query %}${weekly.SQL_TABLE_NAME}
+      {% else %}${monthly.SQL_TABLE_NAME}
+      {% endif %}
+  )
+  select *
+  from temp
+  where staff_id = '{{ _user_attributes['staff_id'] }}'
+;;""",
+            """\
+sql:
+  with
+    temp as (
+      select ts, col1, col2, col3
+      from
+        {% if ts_date._in_query %} ${daily.SQL_TABLE_NAME}
+        {% elsif ts_week._in_query %} ${weekly.SQL_TABLE_NAME}
+        {% else %} ${monthly.SQL_TABLE_NAME}
+        {% endif %}
+    )
+  select *
+  from temp
+  where staff_id = '{{ _user_attributes['staff_id'] }}'
+;;""",
+        ),
+        # html
+        (  # NOTE currently no operation
+            """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
+            """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
+        ),
     ],
+    ids=utils.shorten,
 )
 def test_formatter(input_: str, output: str) -> None:
     # once formatted text matches expected output
