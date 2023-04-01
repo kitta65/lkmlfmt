@@ -1,24 +1,27 @@
 import re
 
 LIQUID_MARKER = "{{% set lktk = {} %}}"
-TAG = re.compile(r"""\{%-?\s*(#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\}""")
+TEMPLATE = re.compile(
+    r"""(?P<tag>\{%-?\s*(?P<type>#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\})"""
+    + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})""",
+)
 
 
 def to_jinja(liquid: str) -> tuple[str, list[str]]:
     jinja = ""
-    tags = []
+    templates = []
     id_ = 0
 
     while True:
-        match = TAG.search(liquid)
+        match = TEMPLATE.search(liquid)
         if match is None:
             jinja += liquid
             break
 
         leading = liquid[: match.start()]
         trailing = liquid[match.end() :]
-        tag = match.group(0)
-        match type_ := match.group(1):
+        template = match.group(0)
+        match type_ := match.group("type"):
             # control flow
             case "if":
                 dummy = "{% if True %}"
@@ -68,6 +71,8 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
             # comment
             case "#":
                 dummy = "{% set x = 'x' %}"
+            case None:
+                dummy = "{{ obj }}"
             # default
             case _:
                 dummy = f"{{% {type_} %}}"
@@ -75,10 +80,10 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
         marker = LIQUID_MARKER.format(id_)
         jinja += f"{leading}{marker}{dummy}{marker}"
         liquid = trailing
-        tags.append(tag)
+        templates.append(template)
         id_ += 1
 
-    return jinja, tags
+    return jinja, templates
 
 
 # TODO consider newline between markers
