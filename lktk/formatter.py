@@ -5,6 +5,8 @@ from typing import Generator
 from lark import ParseTree, Token
 from sqlfmt import api
 
+from lktk import template
+
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 INDENT_WIDTH = 2
@@ -80,11 +82,11 @@ class LkmlFormatter:
 
         # NOTE
         # let's rely on sqlfmt for not only sql but also looker expression!
-        if key != "html":
-            # sql_xxx: ... ;; or expression: ... ;;
-            value = api.format_string(value, mode=MODE).rstrip()
+        if key == "html":
+            value = fmt_html(value)
         else:
-            value = dummy_fmt(value)
+            # sql_xxx: ... ;; or expression: ... ;;
+            value = fmt_sql(value)
 
         lines = value.splitlines()
         if len(lines) == 1:
@@ -206,6 +208,12 @@ def token(token: Token | ParseTree) -> Token:
     raise Exception()
 
 
-def dummy_fmt(code: str) -> str:
-    lines = code.splitlines()
-    return "\n".join(map(lambda s: s.strip(), lines))
+# TODO
+def fmt_html(html: str) -> str:
+    return html
+
+
+def fmt_sql(liquid: str) -> str:
+    jinja, templates = template.to_jinja(liquid)
+    jinja = api.format_string(jinja, mode=MODE).rstrip()
+    return template.to_liquid(jinja, templates)

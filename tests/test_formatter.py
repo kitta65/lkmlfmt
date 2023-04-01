@@ -43,41 +43,6 @@ key2: value*""",
   [ value5 ]
 ]""",
         ),
-        # code block
-        (
-            """sql: code block ;;""",
-            """sql: code block ;;""",
-        ),
-        (
-            """\
-sql: code
-block ;;""",
-            """sql: code block ;;""",
-        ),
-        (
-            """view: ident { derived_table: { sql: select   1   ;; } }""",
-            """\
-view: ident {
-  derived_table: {
-    sql: select 1 ;;
-  }
-}""",
-        ),
-        (
-            """view: ident { derived_table: { sql:
--- comment
-select 1
-;; } }""",
-            """\
-view: ident {
-  derived_table: {
-    sql:
-      -- comment
-      select 1
-    ;;
-  }
-}""",
-        ),
         # dict
         (
             """dict: {}""",
@@ -176,6 +141,36 @@ key: { # comment
 key: { # comment
   key: pair
 }""",
+        ),
+        # sql
+        (
+            """\
+sql:     select     
+1     ;;""",  # noqa: W291
+            """sql: select 1 ;;""",
+        ),
+        (
+            """\
+sql:     1     
++     1     ;;""",  # noqa: W291
+            """sql: 1 + 1 ;;""",
+        ),
+        (
+            """\
+sql:
+-- comment
+select 1
+;;""",
+            """\
+sql:
+  -- comment
+  select 1
+;;""",
+        ),
+        # html
+        (  # NOTE currently no operation
+            """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
+            """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
         ),
     ],
     ids=utils.shorten,
