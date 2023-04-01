@@ -27,6 +27,19 @@ select
 {% set lktk = 1 %}{% else %}{% set lktk = 1 %} 2
 {% set lktk = 2 %}{% endif %}{% set lktk = 2 %}""",
         ),
+        # raw
+        (
+            """\
+select {% raw %}
+"{{string literal}}"
+{% endraw %}
+""",
+            """\
+select {% set lktk = 0 %}{% raw %}{% set lktk = 0 %}
+"{{string literal}}"
+{% set lktk = 1 %}{% endraw %}{% set lktk = 1 %}
+""",
+        ),
         # multiline
         (
             """\

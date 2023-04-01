@@ -11,6 +11,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
     jinja = ""
     templates = []
     id_ = 0
+    skip_to: str | None = None
 
     while True:
         match = TEMPLATE.search(liquid)
@@ -18,10 +19,15 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
             jinja += liquid
             break
 
-        leading = liquid[: match.start()]
-        trailing = liquid[match.end() :]
-        template = match.group(0)
-        match type_ := match.group("type"):
+        type_ = match.group("type")
+        if skip_to is not None and skip_to != type_:
+            jinja += liquid[: match.end()]
+            templates.append(match.group(0))
+            liquid = liquid[match.end() :]
+            continue
+
+        skip_to = None
+        match type_:
             # control flow https://shopify.github.io/liquid/tags/control-flow/
             case "if":
                 dummy = "{% if True %}"
@@ -49,6 +55,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
             # template https://shopify.github.io/liquid/tags/template/
             case "comment":
                 dummy = "{% if False %}{% raw %}"
+                skip_to = "endcomment"
             case "endcomment":
                 dummy = "{% endraw %}{% endif %}"
             case "#":
@@ -59,8 +66,9 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{{ var }}"
             case "raw":
                 dummy = "{% raw %}"
+                skip_to = "endraw"
             case "endraw":
-                dummy = "{% endrow %}"
+                dummy = "{% endraw %}"
             case "render" | "include":
                 dummy = "{% set x = 'x' %}"
             # variable https://shopify.github.io/liquid/tags/variable/
@@ -79,10 +87,13 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
             case _:
                 dummy = f"{{% {type_} %}}"
 
+        # append results
         marker = LIQUID_MARKER.format(id_)
-        jinja += f"{leading}{marker}{dummy}{marker}"
-        liquid = trailing
-        templates.append(template)
+        jinja += f"{liquid[: match.start()]}{marker}{dummy}{marker}"
+        templates.append(match.group(0))
+
+        # prepare for next iteration
+        liquid = liquid[match.end() :]
         id_ += 1
 
     return jinja, templates
