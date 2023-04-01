@@ -3,7 +3,8 @@ import re
 LIQUID_MARKER = "{{% set lktk = {} %}}"
 TEMPLATE = re.compile(
     r"""(?P<tag>\{%-?\s*(?P<type>#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\})"""
-    + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})""",
+    + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})"""
+    + r"""|(?P<looker>\$\{[^}]*?\})""",
 )
 
 
@@ -80,7 +81,17 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{% endset %}"
             case "increment" | "decrement":
                 dummy = "{{ var }}"
-            # object
+            # looker
+            # https://cloud.google.com/looker/docs/liquid-variable-reference#liquid_variable_definitions
+            case "date_start" | "date_end":
+                dummy = "{{ var }}"
+            case "condition":
+                dummy = ""
+            case "endcondition":
+                dummy = ""
+            case "parameter":
+                dummy = "{{ var }}"
+            # {{...}} or ${...}
             case None:
                 dummy = "{{ var }}"
             # default

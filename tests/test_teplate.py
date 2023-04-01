@@ -64,10 +64,15 @@ select {%
 %} 1""",
             "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %} 1",
         ),
-        # object
+        # {{...}}
         (
-            "select {{ '/* object */' }} 1",
-            "select {% set lktk = 0 %}{{ var }}{% set lktk = 0 %} 1",
+            "select {{ '1' }}",
+            "select {% set lktk = 0 %}{{ var }}{% set lktk = 0 %}",
+        ),
+        # ${...}
+        (
+            "select ${x}",
+            "select {% set lktk = 0 %}{{ var }}{% set lktk = 0 %}",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
