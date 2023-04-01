@@ -89,7 +89,7 @@ class LkmlFormatter:
         if key == "html":
             value = fmt_html(value)
         else:
-            # sql_xxx: ... ;; or expression: ... ;;
+            # sql_xxx: ... ;; or expression_xxx: ... ;;
             value = fmt_sql(value)
 
         lines = value.splitlines()
