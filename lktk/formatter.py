@@ -4,15 +4,18 @@ from typing import Generator
 
 from lark import ParseTree, Token
 from sqlfmt import api
+from sqlfmt.line import Line
 
 from lktk import template
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 INDENT_WIDTH = 2
-FOUR_SPACES = re.compile(r"(?!=\S) {4}")
 WS = re.compile(r"\s")
 MODE = api.Mode()
+
+# https://docs.python.org/3/library/functions.html#property
+Line.prefix = property(lambda self: " " * INDENT_WIDTH * self.depth[0])  # type: ignore
 
 
 class LkmlFormatter:
@@ -218,5 +221,4 @@ def fmt_sql(liquid: str) -> str:
     jinja, templates = template.to_jinja(liquid)
     jinja = api.format_string(jinja, mode=MODE).rstrip()
     liquid = template.to_liquid(jinja, templates)
-    liquid = FOUR_SPACES.sub(" " * 2, liquid)
     return liquid
