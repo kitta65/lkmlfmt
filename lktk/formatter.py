@@ -10,6 +10,7 @@ from lktk import template
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 INDENT_WIDTH = 2
+FOUR_SPACES = re.compile(r"(?!=\S) {4}")
 WS = re.compile(r"\s")
 MODE = api.Mode()
 
@@ -216,4 +217,6 @@ def fmt_html(html: str) -> str:
 def fmt_sql(liquid: str) -> str:
     jinja, templates = template.to_jinja(liquid)
     jinja = api.format_string(jinja, mode=MODE).rstrip()
-    return template.to_liquid(jinja, templates)
+    liquid = template.to_liquid(jinja, templates)
+    liquid = FOUR_SPACES.sub(" " * 2, liquid)
+    return liquid
