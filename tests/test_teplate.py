@@ -54,7 +54,7 @@ select {%
         # object
         (
             "select {{ '/* object */' }} 1",
-            "select {% set lktk = 0 %}{{ obj }}{% set lktk = 0 %} 1",
+            "select {% set lktk = 0 %}{{ var }}{% set lktk = 0 %} 1",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),

@@ -48,31 +48,33 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{% endfor %}"
             # template
             case "comment":
-                dummy = "/*"
+                dummy = "{% if False %}{% raw %}"
             case "endcomment":
-                dummy = "*/"
+                dummy = "{% endraw %}{% endif %}"
             case "liquid":
                 dummy = "{% set x = 'x' %}"
+            case "echo":
+                dummy = "{{ var }}"
             case "raw":
-                dummy = "/*"  # or {{"""
+                dummy = "{% raw %}"
             case "endraw":
-                dummy = "*/"  # or """}}
+                dummy = "{% endrow %}"
             case "render" | "include":
                 dummy = "{% set x = 'x' %}"
             # variable
             case "assign":
                 dummy = "{% set x = 'x' %}"
             case "capture":
-                dummy = "/*"  # or {{"""
+                dummy = "{% set var %}"
             case "endcapture":
-                dummy = "*/"  # or """}}
+                dummy = "{% endset %}"
             case "increment" | "decrement":
                 dummy = "{{ var }}"
             # comment
             case "#":
                 dummy = "{% set x = 'x' %}"
             case None:
-                dummy = "{{ obj }}"
+                dummy = "{{ var }}"
             # default
             case _:
                 dummy = f"{{% {type_} %}}"
