@@ -22,7 +22,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
         trailing = liquid[match.end() :]
         template = match.group(0)
         match type_ := match.group("type"):
-            # control flow
+            # control flow https://shopify.github.io/liquid/tags/control-flow/
             case "if":
                 dummy = "{% if True %}"
             case "elsif":
@@ -37,7 +37,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{% elif True %}"
             case "endcase":
                 dummy = "{% endif %}"
-            # iteration
+            # iteration https://shopify.github.io/liquid/tags/iteration/
             case "for":
                 dummy = "{% for i in [] %}"
             case "cycle":
@@ -46,11 +46,13 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{% for i in [] %}"
             case "endtablerow":
                 dummy = "{% endfor %}"
-            # template
+            # template https://shopify.github.io/liquid/tags/template/
             case "comment":
                 dummy = "{% if False %}{% raw %}"
             case "endcomment":
                 dummy = "{% endraw %}{% endif %}"
+            case "#":
+                dummy = "{% set x = 'x' %}"
             case "liquid":
                 dummy = "{% set x = 'x' %}"
             case "echo":
@@ -61,7 +63,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{% endrow %}"
             case "render" | "include":
                 dummy = "{% set x = 'x' %}"
-            # variable
+            # variable https://shopify.github.io/liquid/tags/variable/
             case "assign":
                 dummy = "{% set x = 'x' %}"
             case "capture":
@@ -70,9 +72,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
                 dummy = "{% endset %}"
             case "increment" | "decrement":
                 dummy = "{{ var }}"
-            # comment
-            case "#":
-                dummy = "{% set x = 'x' %}"
+            # object
             case None:
                 dummy = "{{ var }}"
             # default
