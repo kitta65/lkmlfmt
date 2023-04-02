@@ -11,7 +11,6 @@ from lktk import template
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 INDENT_WIDTH = 2
-WS = re.compile(r"\s")
 MODE = api.Mode()
 
 
@@ -38,9 +37,7 @@ class LkmlFormatter:
             return ("\n" if sep is None else sep).join(elms)
 
         if isinstance(t, Token):
-            lcomments = self.fmt_leading_comments_of(t)
-            tcomments = self.fmt_trailing_comments_of(t)
-            return lcomments + WS.sub("", str(t.value)) + tcomments
+            return self.fmt_token(t)
 
         match t.data:
             case "arr":
@@ -73,13 +70,13 @@ class LkmlFormatter:
             self.prepend_indent(lines)
             pairs = "\n".join(lines)
             return f"""[
-{pairs}
+{pairs},
 ]"""
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
         lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
         key = self.fmt(pair.children[0])
-        value = str(pair.children[1])  # don't call self.fmt which remove WS
+        value = str(pair.children[1])
 
         if key == "html":
             value = fmt_html(value)
@@ -146,6 +143,19 @@ class LkmlFormatter:
         # do not have to take care of indentation of the children
         # cause this is a simple wrapper of fmt_dict
         return f"""{name} {dict_}"""
+
+    def fmt_token(self, token: Token) -> str:
+        lcomments = self.fmt_leading_comments_of(token)
+        tcomments = self.fmt_trailing_comments_of(token)
+        t = str(token.value).strip()
+
+        match t[:1]:
+            case '"' | "'":  # string literal
+                pass
+            case _:
+                t = t.replace(" ", "")
+
+        return lcomments + t + tcomments
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         lcomments = self.fmt_leading_comments_of(token(pair.children[0]))

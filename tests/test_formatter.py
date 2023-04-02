@@ -10,10 +10,11 @@ from tests import utils
     [
         ("", ""),
         (
-            """key1: value1 key2: 3.14""",
-            """\
+            '''key1: value1 key2: 3.14 key3: "this is string"''',
+            '''\
 key1: value1
-key2: 3.14""",
+key2: 3.14
+key3: "this is string"''',
         ),
         # ident
         (
@@ -38,9 +39,9 @@ key2: value*""",
   value2,
   [
     value3,
-    value4
+    value4,
   ],
-  [ value5 ]
+  [ value5 ],
 ]""",
         ),
         # dict
@@ -127,7 +128,7 @@ key: [
             """\
 key: [
   # this is comment
-  ident
+  ident,
 ]""",
         ),
         # trailing comments
@@ -141,6 +142,18 @@ key: { # comment
 key: { # comment
   key: pair
 }""",
+        ),
+        (
+            """\
+arr: [
+  value1,
+  value2 # comment
+]""",
+            """\
+arr: [
+  value1,
+  value2, # comment
+]""",
         ),
         # sql
         (
