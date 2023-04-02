@@ -1,7 +1,6 @@
 import pytest
 
-from lktk.formatter import LkmlFormatter
-from lktk.parser import parse
+from lktk.formatter import fmt
 from tests import utils
 
 
@@ -235,11 +234,9 @@ sql:
 )
 def test_formatter(input_: str, output: str) -> None:
     # once formatted text matches expected output
-    tree1, comments = parse(input_, set_parent=True)
-    text1 = LkmlFormatter(tree1, comments).fmt()
+    text1 = fmt(input_)
     assert text1 == output
 
     # twice formatted text also matches expected output
-    tree2, comments = parse(text1, set_parent=True)
-    text2 = LkmlFormatter(tree2, comments).fmt()
+    text2 = fmt(text1)
     assert text2 == output

@@ -6,9 +6,8 @@ from pathlib import Path
 
 import click
 
-from lktk.formatter import LkmlFormatter
+from lktk.formatter import fmt
 from lktk.logger import logger
-from lktk.parser import parse
 
 
 @click.group()
@@ -37,8 +36,7 @@ def format(check: bool, files: list[Path]) -> None:
     for file in filter_lkml(files):
         logger.debug(f"formatting {file}")
         before = file.read_text()
-        tree, comment = parse(before, set_parent=True)
-        after = LkmlFormatter(tree, comment).fmt()
+        after = fmt(before)
 
         if before != after:
             click.echo(f"{file} is modified")

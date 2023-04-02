@@ -6,7 +6,7 @@ from lark import ParseTree, Token
 from sqlfmt import api
 from sqlfmt.line import Line
 
-from lktk import template
+from lktk import parser, template
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
@@ -15,10 +15,13 @@ MODE = api.Mode()
 
 
 class LkmlFormatter:
-    def __init__(self, tree: ParseTree, comments: list[Token]) -> None:
+    def __init__(self, lkml: str) -> None:
+        self.lkml = lkml
+        self.curr_indent = 0
+
+        tree, comments = parser.parse(lkml)
         self.tree = tree
         self.comments = comments
-        self.curr_indent = 0
 
     # NOTE
     # parents take care of indentation of the children
@@ -74,12 +77,12 @@ class LkmlFormatter:
 ]"""
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
-        lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
+        lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])
 
         if key == "html":
-            value = fmt_html(value)
+            value = _fmt_html(value)
             lines = value.splitlines()
             if len(lines) == 1:
                 return f"{lcomments}{key}: {value} ;;"
@@ -97,7 +100,7 @@ class LkmlFormatter:
             Line.prefix = property(  # type: ignore
                 lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
             )
-            value = fmt_sql(value)
+            value = _fmt_sql(value)
 
             if "\n" not in value:
                 return f"{lcomments}{key}: {value.strip()} ;;"
@@ -158,8 +161,8 @@ class LkmlFormatter:
         return lcomments + t + tcomments
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
-        lcomments = self.fmt_leading_comments_of(token(pair.children[0]))
-        tcomments = self.fmt_trailing_comments_of(token(pair.children[0]))
+        lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
+        tcomments = self.fmt_trailing_comments_of(_token(pair.children[0]))
 
         key = self.fmt(pair.children[0])
         value = self.fmt(pair.children[1])
@@ -222,20 +225,25 @@ class LkmlFormatter:
         return COMMENT_MARKER + comments + COMMENT_MARKER
 
 
-def token(token: Token | ParseTree) -> Token:
+def _token(token: Token | ParseTree) -> Token:
     if isinstance(token, Token):
         return token
     raise Exception()
 
 
 # TODO
-def fmt_html(html: str) -> str:
+def _fmt_html(html: str) -> str:
     return html
 
 
-def fmt_sql(liquid: str) -> str:
+def _fmt_sql(liquid: str) -> str:
     jinja, templates = template.to_jinja(liquid)
     # NOTE let's rely on sqlfmt for not only sql but also looker expression!
     jinja = api.format_string(jinja, mode=MODE).rstrip()
     liquid = template.to_liquid(jinja, templates)
     return liquid
+
+
+def fmt(lkml: str) -> str:
+    formatter = LkmlFormatter(lkml)
+    return formatter.fmt()
