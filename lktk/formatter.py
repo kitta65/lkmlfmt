@@ -258,6 +258,7 @@ def _fmt_html(html: str) -> str:
     return html
 
 
+# TODO format liquid tag and variales
 def _fmt_sql(liquid: str) -> str:
     jinja, templates = template.to_jinja(liquid)
     # NOTE let's rely on sqlfmt for not only sql but also looker expression!

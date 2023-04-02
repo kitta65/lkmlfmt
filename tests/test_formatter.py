@@ -236,6 +236,20 @@ sql:
   where staff_id = '{{ _user_attributes['staff_id'] }}'
 ;;""",
         ),
+        # template
+        # TODO
+        # (
+        #     """sql: {{   var   }} ;;""",
+        #     """sql: {{ var }} ;;""",
+        # ),
+        # (
+        #     """sql: {{ foo . var }} ;;""",
+        #     """sql: {{ foo.var }} ;;""",
+        # ),
+        # (
+        #     """sql: {{ "foo" | append : "bar" }} ;;""",
+        #     """sql: {{ "foo" | append: "bar" }} ;;""",
+        # ),
         # html
         (  # NOTE currently no operation
             """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
