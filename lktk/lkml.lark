@@ -11,6 +11,7 @@ arr: "[" [(value | pair) ("," (value | pair))* [","]] "]"
       | STRING
       | NUMBER
       | IDENT
+CNAME: DIGIT* ("_"|LETTER) ("_"|LETTER|DIGIT)*
 IDENT: [/(\+|-)\s*/] CNAME (/\s*\.\s*/ CNAME)* [/\s*?\*/]
 COMMENT: /#.*/
 // \S is needed cause 0 width regexp is not allowed here
@@ -19,7 +20,8 @@ CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
 CODEBLOCKKEY.1: /expression\w*/ | "html" | /sql\w*/
 STRING : "\"" /(.|\n)*?/ /(?<!\\)(\\\\)*?/ "\""
 
-%import common.CNAME
+%import common.DIGIT
+%import common.LETTER
 %import common.NUMBER
 %import common.WS
 %ignore WS

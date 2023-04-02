@@ -45,6 +45,22 @@ from tests import utils
         yes
 """,
         ),
+        (
+            '''20230101_is: "new year's day"''',
+            """lkml
+    value_pair
+        20230101_is
+        "new year's day"
+""",
+        ),
+        (
+            '_: "is valid identifier"',
+            """lkml
+    value_pair
+        _
+        "is valid identifier"
+""",
+        ),
         (  # space surrounding . is allowed
             "dot1: viewname.fieldname dot2: viewname . fieldname",
             """lkml
