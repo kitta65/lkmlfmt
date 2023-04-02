@@ -170,6 +170,20 @@ sql:
         (
             """\
 sql:
+  select '''multiline string
+
+'''
+;;""",
+            """\
+sql:
+  select '''multiline string
+
+'''
+;;""",
+        ),
+        (
+            """\
+sql:
   with temp as (
     select ts, col1, col2, col3
     from

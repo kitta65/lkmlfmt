@@ -14,9 +14,6 @@ INDENT_WIDTH = 2
 WS = re.compile(r"\s")
 MODE = api.Mode()
 
-# https://docs.python.org/3/library/functions.html#property
-Line.prefix = property(lambda self: " " * INDENT_WIDTH * self.depth[0])  # type: ignore
-
 
 class LkmlFormatter:
     def __init__(self, tree: ParseTree, comments: list[Token]) -> None:
@@ -84,21 +81,30 @@ class LkmlFormatter:
         key = self.fmt(pair.children[0])
         value = str(pair.children[1])  # don't call self.fmt which remove WS
 
-        # NOTE
-        # let's rely on sqlfmt for not only sql but also looker expression!
         if key == "html":
             value = fmt_html(value)
-        else:
-            # sql_xxx: ... ;; or expression_xxx: ... ;;
+            lines = value.splitlines()
+            if len(lines) == 1:
+                return f"{lcomments}{key}: {value} ;;"
+
+            with self.indent():
+                self.prepend_indent(lines)
+                value = "\n".join(lines)
+                return f"""{lcomments}{key}:
+{value}
+;;"""
+
+        # sql_xxx: ... ;; or expression_xxx: ... ;;
+        with self.indent():
+            # https://docs.python.org/3/library/functions.html#property
+            Line.prefix = property(  # type: ignore
+                lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
+            )
             value = fmt_sql(value)
 
-        lines = value.splitlines()
-        if len(lines) == 1:
-            return f"{lcomments}{key}: {value} ;;"
+            if "\n" not in value:
+                return f"{lcomments}{key}: {value.strip()} ;;"
 
-        with self.indent():
-            self.prepend_indent(lines)
-            value = "\n".join(lines)
             return f"""{lcomments}{key}:
 {value}
 ;;"""
@@ -152,7 +158,7 @@ class LkmlFormatter:
     def prepend_indent(self, lines: list[str]) -> None:
         # https://stackoverflow.com/questions/3000461/python-map-in-place
         indent = " " * INDENT_WIDTH * self.curr_indent
-        lines[:] = map(lambda line: indent + line, lines)
+        lines[:] = map(lambda line: (indent + line) if line != "" else "", lines)
 
     # https://stackoverflow.com/questions/49733699/python-type-hints-and-context-managers
     @contextmanager
@@ -219,6 +225,7 @@ def fmt_html(html: str) -> str:
 
 def fmt_sql(liquid: str) -> str:
     jinja, templates = template.to_jinja(liquid)
+    # NOTE let's rely on sqlfmt for not only sql but also looker expression!
     jinja = api.format_string(jinja, mode=MODE).rstrip()
     liquid = template.to_liquid(jinja, templates)
     return liquid
