@@ -11,6 +11,7 @@ from lktk.logger import logger
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
+BLANK_LINE = re.compile(r"^\s*$")
 INDENT_WIDTH = 2
 MODE = api.Mode()
 
@@ -20,7 +21,7 @@ class LkmlFormatter:
         self.lkml = lkml
         self.curr_indent = 0
 
-        tree, comments = parser.parse(lkml)
+        tree, comments = parser.parse(lkml, set_position=True)
         self.tree = tree
         self.comments = comments
 
@@ -124,7 +125,28 @@ class LkmlFormatter:
 }}"""
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
-        lkml = self.fmt(lookml.children)
+        lkml = ""
+        stmts = [child for child in lookml.children]
+        for i, s in enumerate(stmts):
+            if i == 0:
+                lkml += self.fmt(s)
+                continue
+
+            prev_line: int | None = stmts[i - 1]._position.end_line  # type: ignore
+            next_line: int | None = s._position.line  # type: ignore
+            if prev_line is None or next_line is None:
+                lkml += "\n"
+                lkml += self.fmt(s)
+                continue
+
+            for _ in filter(
+                lambda s: BLANK_LINE.match(s) is not None,
+                self.lkml.splitlines()[prev_line:next_line],
+            ):
+                lkml += "\n"
+            lkml += "\n"
+            lkml += self.fmt(s)
+
         while 0 < len(self.comments):
             lkml += f"\n{str(self.comments.pop(0).value).rstrip()}"
         lkml = lkml.lstrip()  # in the case of lkml == "\n#comment"

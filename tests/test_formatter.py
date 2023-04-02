@@ -15,6 +15,18 @@ key1: value1
 key2: 3.14
 key3: "this is string"''',
         ),
+        (
+            """\
+include: "path"
+
+  
+key: value""",  # noqa: W293
+            """\
+include: "path"
+
+
+key: value""",
+        ),
         # ident
         (
             """key1: parent . child key2: value *""",
