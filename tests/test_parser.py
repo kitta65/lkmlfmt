@@ -169,6 +169,28 @@ from tests import utils
         "value # not comment"
 """,
         ),
+        (
+            r'key: "escaped\"string"',
+            r"""lkml
+    value_pair
+        key
+        "escaped\"string"
+""",
+        ),
+        (
+            '''key: "
+multiline
+string
+"''',
+            """lkml
+    value_pair
+        key
+        "
+multiline
+string
+"
+""",
+        ),
         # codeblock
         (
             "expression: #this is code block ;;",

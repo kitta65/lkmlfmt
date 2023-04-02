@@ -8,7 +8,7 @@ arr: "[" [(value | pair) ("," (value | pair))* [","]] "]"
 ?value: arr
       | dict
       | named_dict
-      | ESCAPED_STRING
+      | STRING
       | NUMBER
       | IDENT
 IDENT: [/(\+|-)\s*/] CNAME (/\s*\.\s*/ CNAME)* [/\s*?\*/]
@@ -17,9 +17,9 @@ COMMENT: /#.*/
 CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
 // higher priority than IDENT
 CODEBLOCKKEY.1: /expression\w*/ | "html" | /sql\w*/
+STRING : "\"" /(.|\n)*?/ /(?<!\\)(\\\\)*?/ "\""
 
 %import common.CNAME
-%import common.ESCAPED_STRING
 %import common.NUMBER
 %import common.WS
 %ignore WS
