@@ -1,11 +1,14 @@
 import re
 
-LIQUID_MARKER = "{{% set lktk = {} %}}"
+LIQUID_MARKER = "{{% set LKTK_MARKER = {} %}}"
 TEMPLATE = re.compile(
     r"""(?P<tag>\{%-?\s*(?P<type>#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\})"""
     + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})"""
     + r"""|(?P<looker>\$\{[^}]*?\})""",
 )
+LEADING_N = re.compile(r"^ *\n")
+TRAILING_N = re.compile(r"\n *$")
+INDENT = re.compile(r"^\n?(?P<indent> +)")
 
 
 def to_jinja(liquid: str) -> tuple[str, list[str]]:
@@ -88,7 +91,7 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
             case "condition":
                 dummy = ""
             case "endcondition":
-                dummy = ""
+                dummy = ""  # TODO use endxxx
             case "parameter":
                 dummy = "{{ var }}"
             # {{...}} or ${...}
@@ -110,9 +113,21 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
     return jinja, templates
 
 
-# TODO consider newline between markers
 def to_liquid(jinja: str, tags: list[str]) -> str:
     for i, tag in enumerate(tags):
-        leading, _, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
-        jinja = leading + tag + trailing
+        leading, dummy, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
+        lead_n = LEADING_N.match(dummy) is not None
+        trail_n = TRAILING_N.match(dummy) is not None
+        indent = ""
+
+        if lead_n:
+            leading = leading.rstrip("\n ") + "\n"
+            match = INDENT.match(dummy)
+            if match is not None:
+                indent = match.group("indent")
+
+        if trail_n:
+            trailing = "\n" + trailing.lstrip("\n ")
+
+        jinja = leading + indent + tag + trailing
     return jinja

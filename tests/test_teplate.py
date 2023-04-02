@@ -23,9 +23,9 @@ select
 {% endif %}""",
             """\
 select
-{% set lktk = 0 %}{% if True %}{% set lktk = 0 %} 1
-{% set lktk = 1 %}{% else %}{% set lktk = 1 %} 2
-{% set lktk = 2 %}{% endif %}{% set lktk = 2 %}""",
+{% set LKTK_MARKER = 0 %}{% if True %}{% set LKTK_MARKER = 0 %} 1
+{% set LKTK_MARKER = 1 %}{% else %}{% set LKTK_MARKER = 1 %} 2
+{% set LKTK_MARKER = 2 %}{% endif %}{% set LKTK_MARKER = 2 %}""",
         ),
         # raw
         (
@@ -35,9 +35,9 @@ select {% raw %}
 {% endraw %}
 """,
             """\
-select {% set lktk = 0 %}{% raw %}{% set lktk = 0 %}
+select {% set LKTK_MARKER = 0 %}{% raw %}{% set LKTK_MARKER = 0 %}
 "{{string literal}}"
-{% set lktk = 1 %}{% endraw %}{% set lktk = 1 %}
+{% set LKTK_MARKER = 1 %}{% endraw %}{% set LKTK_MARKER = 1 %}
 """,
         ),
         # multiline
@@ -48,12 +48,14 @@ select {%
   assign x = "x"
   echo x
 %}""",
-            "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %}",
+            """\
+select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %}""",
         ),
         # comment
         (
             "select {% # comment %} 1",
-            "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %} 1",
+            """\
+select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %} 1""",
         ),
         (
             """\
@@ -62,17 +64,18 @@ select {%
   # is
   # comment
 %} 1""",
-            "select {% set lktk = 0 %}{% set x = 'x' %}{% set lktk = 0 %} 1",
+            """\
+select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %} 1""",
         ),
         # {{...}}
         (
             "select {{ '1' }}",
-            "select {% set lktk = 0 %}{{ var }}{% set lktk = 0 %}",
+            "select {% set LKTK_MARKER = 0 %}{{ var }}{% set LKTK_MARKER = 0 %}",
         ),
         # ${...}
         (
             "select ${x}",
-            "select {% set lktk = 0 %}{{ var }}{% set lktk = 0 %}",
+            "select {% set LKTK_MARKER = 0 %}{{ var }}{% set LKTK_MARKER = 0 %}",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
@@ -89,9 +92,9 @@ def test_to_jinja(liquid: str, jinja: str) -> None:
         (
             """\
 select
-{% set lktk = 0 %}{% if True %}{% set lktk = 0 %} 1
-{% set lktk = 1 %}{% else %}{% set lktk = 1 %} 2
-{% set lktk = 2 %}{% endif %}{% set lktk = 2 %}""",
+{% set LKTK_MARKER = 0 %}{% if True %}{% set LKTK_MARKER = 0 %} 1
+{% set LKTK_MARKER = 1 %}{% else %}{% set LKTK_MARKER = 1 %} 2
+{% set LKTK_MARKER = 2 %}{% endif %}{% set LKTK_MARKER = 2 %}""",
             """\
 select
 {% if foo == 'bar' %} 1

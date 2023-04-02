@@ -9,7 +9,7 @@ from sqlfmt.line import Line
 from lktk import parser, template
 from lktk.logger import logger
 
-COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
+COMMENT_MARKER = "#LKTK_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 BLANK_LINE = re.compile(r"^\s*$")
 INDENT_WIDTH = 2
