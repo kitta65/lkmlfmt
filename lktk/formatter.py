@@ -7,6 +7,7 @@ from sqlfmt import api
 from sqlfmt.line import Line
 
 from lktk import parser, template
+from lktk.logger import logger
 
 COMMENT_MARKER = "#LKTK_COMMENT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
@@ -56,7 +57,7 @@ class LkmlFormatter:
             case "value_pair":
                 return self.fmt_value_pair(t)
             case _:
-                print(f"unknown data: {t.data}")
+                logger.warning(f"unknown data: {t.data}")
                 return ""
 
     def fmt_arr(self, arr: ParseTree) -> str:
@@ -150,13 +151,12 @@ class LkmlFormatter:
     def fmt_token(self, token: Token) -> str:
         lcomments = self.fmt_leading_comments_of(token)
         tcomments = self.fmt_trailing_comments_of(token)
-        t = str(token.value).strip()
 
-        match t[:1]:
-            case '"' | "'":  # string literal
-                pass
+        match token.type:
+            case "STRING":
+                t = str(token.value).strip()
             case _:
-                t = t.replace(" ", "")
+                t = str(token.value).replace(" ", "")
 
         return lcomments + t + tcomments
 
