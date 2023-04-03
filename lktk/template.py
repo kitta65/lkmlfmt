@@ -87,9 +87,9 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
             case "date_start" | "date_end":
                 dummy = "{{ var }}"
             case "condition":
-                dummy = ""
+                dummy = "{% filter upper %}"
             case "endcondition":
-                dummy = ""  # TODO use endxxx
+                dummy = "{% endfilter %}"
             case "parameter":
                 dummy = "{{ var }}"
             # {{...}} or ${...}
