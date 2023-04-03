@@ -13,6 +13,6 @@ fmt:
 
 .PHONY: publish
 publish:
-	python -c 'import tomllib,os,pathlib;v=tomllib.loads(pathlib.Path("pyproject.toml").read_text())["tool"]["poetry"]["version"];assert v==os.getenv("GITHUB_REF","").replace("refs/tags/","")'
+	./scripts/version.py
 	poetry build
 	poetry publish --password ${PYPI_PASSWORD} --username dr666m1
