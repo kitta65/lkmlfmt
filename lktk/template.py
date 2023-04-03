@@ -6,9 +6,7 @@ TEMPLATE = re.compile(
     + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})"""
     + r"""|(?P<looker>\$\{[^}]*?\})""",
 )
-LEADING_N = re.compile(r"^ *\n")
-TRAILING_N = re.compile(r"\n *$")
-INDENT = re.compile(r"^\n?(?P<indent> +)")
+DUMMY = re.compile(r"^(?P<lead_n> *?\n)?(?P<indent> *)")
 
 
 def to_jinja(liquid: str) -> tuple[str, list[str]]:
@@ -116,18 +114,13 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
 def to_liquid(jinja: str, tags: list[str]) -> str:
     for i, tag in enumerate(tags):
         leading, dummy, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
-        lead_n = LEADING_N.match(dummy) is not None
-        trail_n = TRAILING_N.match(dummy) is not None
-        indent = ""
+        match = DUMMY.match(dummy)
+        if match is None:
+            raise Exception()
 
-        if lead_n:
+        if match.group("lead_n") is not None:
             leading = leading.rstrip("\n ") + "\n"
-            match = INDENT.match(dummy)
-            if match is not None:
-                indent = match.group("indent")
+            tag = match.group("indent") + tag
 
-        if trail_n:
-            trailing = "\n" + trailing.lstrip("\n ")
-
-        jinja = leading + indent + tag + trailing
+        jinja = leading + tag + trailing
     return jinja
