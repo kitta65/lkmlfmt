@@ -88,19 +88,82 @@ def test_to_jinja(liquid: str, jinja: str) -> None:
 @pytest.mark.parametrize(
     "jinja,liquid,tags",
     [
-        # no tag
+        # no template
+        ("select 1", "select 1", []),
         (
             """\
 select
-{% set LKTK_MARKER = 0 %}{% if True %}{% set LKTK_MARKER = 0 %} 1
-{% set LKTK_MARKER = 1 %}{% else %}{% set LKTK_MARKER = 1 %} 2
-{% set LKTK_MARKER = 2 %}{% endif %}{% set LKTK_MARKER = 2 %}""",
+  {% set LKTK_MARKER = 0 %}{{ a }}{% set LKTK_MARKER = 0 %},
+  {% set LKTK_MARKER = 1 %} {{ b }} {% set LKTK_MARKER = 1 %},
+""",
             """\
 select
-{% if foo == 'bar' %} 1
-{% else %} 2
-{% endif %}""",
-            ["{% if foo == 'bar' %}", "{% else %}", "{% endif %}"],
+  {{ A }},
+  {{ B }},
+""",
+            ["{{ A }}", "{{ B }}"],
+        ),
+        (
+            """\
+select
+  {% set LKTK_MARKER = 0 %}{{ a }}
+  {% set LKTK_MARKER = 0 %},
+  {% set LKTK_MARKER = 1 %} {{ b }}
+  {% set LKTK_MARKER = 1 %},
+""",
+            """\
+select
+  {{ A }},
+  {{ B }},
+""",
+            ["{{ A }}", "{{ B }}"],
+        ),
+        (
+            """\
+select
+  {% set LKTK_MARKER = 0 %}
+  {{ a }}{% set LKTK_MARKER = 0 %},
+  {% set LKTK_MARKER = 1 %}
+  {{ b }} {% set LKTK_MARKER = 1 %},
+""",
+            """\
+select
+  {{ A }},
+  {{ B }},
+""",
+            ["{{ A }}", "{{ B }}"],
+        ),
+        (
+            """\
+select
+  {% set LKTK_MARKER = 0 %}
+  {{ a }}
+  {% set LKTK_MARKER = 0 %},
+  {% set LKTK_MARKER = 1 %}
+  {{ b }}
+  {% set LKTK_MARKER = 1 %},
+""",
+            """\
+select
+  {{ A }},
+  {{ B }},
+""",
+            ["{{ A }}", "{{ B }}"],
+        ),
+        (
+            """\
+select {% set LKTK_MARKER = 0 %}
+  {{ a }}
+  {% set LKTK_MARKER = 0 %}, {% set LKTK_MARKER = 1 %}
+  {{ b }}
+  {% set LKTK_MARKER = 1 %},
+""",
+            """\
+select
+  {{ A }},
+  {{ B }},
+""",
+            ["{{ A }}", "{{ B }}"],
         ),
     ],
     ids=utils.shorten,
