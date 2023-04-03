@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lktk"
-version = "0.1.0"
+version = "0.0.1"
 description = ""
 authors = ["dr666m1 <skndr666m1@gmail.com>"]
 readme = "README.md"
