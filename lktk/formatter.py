@@ -7,6 +7,7 @@ from sqlfmt import api
 from sqlfmt.line import Line
 
 from lktk import parser, template
+from lktk.exception import LktkException
 from lktk.logger import logger
 
 COMMENT_MARKER = "#LKTK_MARKER#"
@@ -250,7 +251,7 @@ class LkmlFormatter:
 def _token(token: Token | ParseTree) -> Token:
     if isinstance(token, Token):
         return token
-    raise Exception()
+    raise LktkException()
 
 
 # TODO
