@@ -3,7 +3,8 @@ on:
   schedule:
     # 17:00 Asia/Tokyo
     - cron: "0 8 * * *"
-  workflow_dispatch:
+  # TODO remove push
+  push:
 permissions:
   issues: write
 
