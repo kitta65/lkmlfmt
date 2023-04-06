@@ -2,7 +2,7 @@ name: rss
 on:
   schedule:
     # 17:00 Asia/Tokyo
-    - cron: "0 8 * * *"
+    - cron: "0 * * * *"
   # TODO remove push
   push:
 permissions:
