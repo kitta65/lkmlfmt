@@ -29,27 +29,31 @@ def run(log_level: str) -> None:
     is_flag=True,
     help="Don't update files. Instead, exit with status code 1 if any file should be modefied.",  # noqa: #501
 )
-@click.argument("files", type=click.Path(exists=True, path_type=Path), nargs=-1)
-def format(check: bool, files: list[Path]) -> None:
+@click.argument("file", type=click.Path(exists=True, path_type=Path), nargs=-1)
+def format(check: bool, file: list[Path]) -> None:
+    """Format LookML file(s).
+
+    FILE is the LookML file(s) to format (directory is also OK).
+    Files which does not end with `.lkml` will be ignored.
+    """
     modified: list[bool] = []
 
-    for file in filter_lkml(files):
-        logger.debug(f"formatting {file}")
-        before = file.read_text()
+    for f in filter_lkml(file):
+        logger.debug(f"formatting {f}")
+        before = f.read_text()
         after = fmt(before)
 
         if before != after:
-            click.echo(f"{file} is modified")
+            click.echo(f"{f} is modified")
             modified.append(True)
         else:
-            click.echo(f"{file} is skipped")
+            click.echo(f"{f} is skipped")
             modified.append(False)
 
         if check:
             print_diff(before, after)
         else:
-            with open(file, "w") as f:
-                f.write(after)
+            f.write_text(after)
 
     # https://stackoverflow.com/questions/12765833/counting-the-number-of-true-booleans-in-a-python-list
     n_modified = modified.count(True)
