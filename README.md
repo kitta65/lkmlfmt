@@ -25,9 +25,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
       # you should specify the version of lktk!
       - run: pip install lktk
       - run: lktk format --check path/to/lookml/file/or/directory
@@ -42,9 +39,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-python@v4
-        with:
-          python-version: '3.11'
       # you should specify the version of lktk!
       - run: pip install lktk
       - run: lktk format path/to/lookml/file/or/directory

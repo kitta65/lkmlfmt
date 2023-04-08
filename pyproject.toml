@@ -9,7 +9,7 @@ readme = "README.md"
 lktk = "lktk.command:run"
 
 [tool.poetry.dependencies]
-python = "^3.11"
+python = "^3.10"
 lark = "^1.1.5"
 shandy-sqlfmt = "^0.17.0"
 click = "^8.1.3"

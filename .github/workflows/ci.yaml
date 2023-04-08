@@ -7,7 +7,7 @@ jobs:
       - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
           cache: poetry
       - run: poetry install
       - run: make test
@@ -20,7 +20,7 @@ jobs:
       - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
-          python-version: '3.11'
+          python-version: '3.10'
       - run: make publish
         env:
           PYPI_PASSWORD: ${{ secrets.PYPI_PASSWORD }}
