@@ -28,15 +28,14 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: pip
-      - run: pip install
+      # you should specify the version of lktk!
+      - run: pip install lktk
       - run: lktk format --check path/to/lookml/file/or/directory
 ```
 
 To format specific branch and create pull request.
 
 ```yaml
-# WIP
 on: [workflow_dispatch]
 jobs:
   format-pr:
@@ -46,9 +45,10 @@ jobs:
       - uses: actions/setup-python@v4
         with:
           python-version: '3.11'
-          cache: pip
-      - run: pip install
+      # you should specify the version of lktk!
+      - run: pip install lktk
       - run: lktk format path/to/lookml/file/or/directory
+      - uses: peter-evans/create-pull-request@v5
 ```
 
 ## Feedback
