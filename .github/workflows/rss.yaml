@@ -1,10 +1,8 @@
 name: rss
 on:
   schedule:
-    # hourly
-    - cron: "0 * * * *"
-  # TODO remove push
-  push:
+    # 17:00 Asia/Tokyo
+    - cron: "0 8 * * *"
 permissions:
   issues: write
 
@@ -49,6 +47,5 @@ jobs:
                 gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
               fi
             done
-            false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
