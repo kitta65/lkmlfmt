@@ -49,5 +49,6 @@ jobs:
                 gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
               fi
             done
+            false
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
