@@ -24,28 +24,28 @@ jobs:
   create-issues:
     needs: get-releases
     runs-on: ubuntu-latest
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      # https://docs.github.com/en/rest/guides/best-practices-for-integrators?apiVersion=2022-11-28#dealing-with-secondary-rate-limits
-      SLEEP_SEC: 5
     steps:
       # https://stackoverflow.com/questions/6980090/how-to-read-from-a-file-or-standard-input-in-bash
-      - run: |
-          label=rss
-          gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
-          sleep $SLEEP_SEC
-          gh search issues --match title --repo $GITHUB_REPOSITORY --label $label --sort created --order desc --limit 50 > issues.txt
-          cat issues.txt
+      - uses: nick-fields/retry@v2
+        with:
+          timeout_minutes: 1
+          max_attempts: 3
+          command: |
+            label=rss
+            gh label create $label --force --repo dr666m1/looker-toolkit # create label if not exists
+            gh search issues --match title --repo $GITHUB_REPOSITORY --label $label --sort created --order desc --limit 50 > issues.txt
+            cat issues.txt
 
-          echo '${{ needs.get-releases.outputs.releases }}' |
-          jq -c '.[]' |
-          while read -r release; do
-            title=$(echo $release | jq -c -r '.title')
-            link=$(echo $release | jq -c -r '.link')
-            if grep "$title" issues.txt > /dev/null; then
-              echo skipping "$title"
-            else
-              sleep $SLEEP_SEC
-              gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
-            fi
-          done
+            echo '${{ needs.get-releases.outputs.releases }}' |
+            jq -c '.[]' |
+            while read -r release; do
+              title=$(echo $release | jq -c -r '.title')
+              link=$(echo $release | jq -c -r '.link')
+              if grep "$title" issues.txt > /dev/null; then
+                echo skipping "$title"
+              else
+                gh issue create --label $label --repo $GITHUB_REPOSITORY --title "$title" --body "$link"
+              fi
+            done
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

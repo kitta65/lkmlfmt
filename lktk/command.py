@@ -43,12 +43,13 @@ def format(check: bool, file: list[Path]) -> None:
         before = f.read_text()
         after = fmt(before)
 
-        if before != after:
-            click.echo(f"{f} is modified")
-            modified.append(True)
-        else:
+        if before == after:
             click.echo(f"{f} is skipped")
             modified.append(False)
+            continue
+
+        click.echo(f"{file} is modified")
+        modified.append(True)
 
         if check:
             print_diff(before, after)
