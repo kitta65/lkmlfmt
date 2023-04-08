@@ -27,13 +27,15 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
+          # '>=3.11' is required
           python-version: '3.11'
+
       # you should specify the version of lktk!
       - run: pip install lktk
       - run: lktk format --check path/to/lookml/file/or/directory
 ```
 
-To format specific branch and create pull request.
+To format arbitrary branch and create pull request.
 
 ```yaml
 on: [workflow_dispatch]
@@ -44,10 +46,15 @@ jobs:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
+          # '>=3.11' is required
           python-version: '3.11'
+
       # you should specify the version of lktk!
       - run: pip install lktk
       - run: lktk format path/to/lookml/file/or/directory
+
+      # check the documentation especially about workflow permissions
+      # https://github.com/marketplace/actions/create-pull-request
       - uses: peter-evans/create-pull-request@v5
 ```
 
