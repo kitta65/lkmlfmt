@@ -56,6 +56,8 @@ jobs:
       # check the documentation especially about workflow permissions
       # https://github.com/marketplace/actions/create-pull-request
       - uses: peter-evans/create-pull-request@v5
+        with:
+          branch: format/${{ github.ref_name }}
 ```
 
 ## Feedback
