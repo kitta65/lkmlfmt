@@ -68,7 +68,6 @@ def format(check: bool, file: list[Path]) -> None:
 run.add_command(format)
 
 
-# TODO ignore files listed in .gitignore
 def filter_lkml(files: Iterable[Path]) -> Iterable[Path]:
     res = []
 

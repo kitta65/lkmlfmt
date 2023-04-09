@@ -60,7 +60,6 @@ class LkmlFormatter:
                 return self.fmt_value_pair(t)
             case _:
                 logger.warning(f"unknown data: {t.data}")
-                # TODO fall back
                 raise LktkException()
 
     def fmt_arr(self, arr: ParseTree) -> str:
