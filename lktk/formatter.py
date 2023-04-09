@@ -27,12 +27,12 @@ class LkmlFormatter:
         self.comments = comments
 
     # NOTE
-    # parents take care of indentation of the children
+    # parents take care of self.curr_indent, but children call fmt_indent()
     # parents take care of separator of the children
     def fmt(
         self,
         tree: ParseTree | Token | list[ParseTree | Token] | None = None,
-        sep: str | None = None,
+        sep: str = "\n",
     ) -> str:
         t = self.tree if tree is None else tree
 
@@ -40,7 +40,7 @@ class LkmlFormatter:
             elms = []
             for elm in t:
                 elms.append(self.fmt(elm))
-            return ("\n" if sep is None else sep).join(elms)
+            return sep.join(elms)
 
         if isinstance(t, Token):
             return self.fmt_token(t)
@@ -60,42 +60,38 @@ class LkmlFormatter:
                 return self.fmt_value_pair(t)
             case _:
                 logger.warning(f"unknown data: {t.data}")
-                return ""
+                # TODO fall back
+                raise LktkException()
 
     def fmt_arr(self, arr: ParseTree) -> str:
         if arr.children[0] is None:
-            return "[]"
-
-        values = self.fmt(arr.children, ",\n")
-
-        lines = values.splitlines()
-        if len(lines) == 1:
-            return f"[ {values} ]"
+            return f"{self.fmt_indent()}[]"
 
         with self.indent():
-            self.prepend_indent(lines)
-            pairs = "\n".join(lines)
-            return f"""[
-{pairs},
-]"""
+            values = self.fmt(arr.children, ",\n")
+
+        if "\n" not in values:
+            return f"{self.fmt_indent()}[ {values.lstrip()} ]"
+
+        return f"""{self.fmt_indent()}[
+{values},
+{self.fmt_indent()}]"""
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
         lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
-        key = self.fmt(pair.children[0])
+        key = self.fmt(pair.children[0]).lstrip()
         value = str(pair.children[1])
 
         if key == "html":
-            value = _fmt_html(value)
-            lines = value.splitlines()
-            if len(lines) == 1:
-                return f"{lcomments}{key}: {value} ;;"
-
             with self.indent():
-                self.prepend_indent(lines)
-                value = "\n".join(lines)
-                return f"""{lcomments}{key}:
+                value = _fmt_html(value)
+
+            if "\n" not in value:
+                return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
+
+            return f"""{lcomments}{self.fmt_indent()}{key}:
 {value}
-;;"""
+{self.fmt_indent()};;"""
 
         # sql_xxx: ... ;; or expression_xxx: ... ;;
         with self.indent():
@@ -105,25 +101,23 @@ class LkmlFormatter:
             )
             value = _fmt_sql(value)
 
-            if "\n" not in value:
-                return f"{lcomments}{key}: {value.strip()} ;;"
+        if "\n" not in value:
+            return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
 
-            return f"""{lcomments}{key}:
+        return f"""{lcomments}{self.fmt_indent()}{key.strip()}:
 {value}
-;;"""
+{self.fmt_indent()};;"""
 
     def fmt_dict(self, dict_: ParseTree) -> str:
-        pairs = self.fmt(dict_.children)
-        if pairs == "":
-            return "{}"
-
-        lines = pairs.splitlines()
         with self.indent():
-            self.prepend_indent(lines)
-            pairs = "\n".join(lines)
-            return f"""{{
+            pairs = self.fmt(dict_.children)
+
+        if pairs == "":
+            return f"{self.fmt_indent()}{{}}"
+
+        return f"""{self.fmt_indent()}{{
 {pairs}
-}}"""
+{self.fmt_indent()}}}"""
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
         lkml = ""
@@ -133,6 +127,7 @@ class LkmlFormatter:
                 lkml += self.fmt(s)
                 continue
 
+            # handle blank line
             prev_line: int | None = stmts[i - 1]._position.end_line  # type: ignore
             next_line: int | None = s._position.line  # type: ignore
             if prev_line is None or next_line is None:
@@ -149,9 +144,11 @@ class LkmlFormatter:
             lkml += self.fmt(s)
 
         while 0 < len(self.comments):
+            # comments may have trailing space
             lkml += f"\n{str(self.comments.pop(0).value).rstrip()}"
         lkml = lkml.lstrip()  # in the case of lkml == "\n#comment"
 
+        # handle trailing comments
         lines = []
         for line in lkml.splitlines():
             pieces = COMMENT.split(line)
@@ -161,15 +158,16 @@ class LkmlFormatter:
                 lines.append(f"{main}")
             else:
                 lines.append(f"{main} {tcomments}")
+
         return "\n".join(lines)
 
     def fmt_named_dict(self, ndict: ParseTree) -> str:
-        name = self.fmt(ndict.children[0])
-        dict_ = self.fmt(ndict.children[1])
+        name = self.fmt(ndict.children[0]).lstrip()
+        dict_ = self.fmt(ndict.children[1]).lstrip()
         # NOTE
-        # do not have to take care of indentation of the children
-        # cause this is a simple wrapper of fmt_dict
-        return f"""{name} {dict_}"""
+        # since this is a simple wrapper of fmt_dict
+        # do not have to increment curr_indent
+        return f"""{self.fmt_indent()}{name} {dict_}"""
 
     def fmt_token(self, token: Token) -> str:
         lcomments = self.fmt_leading_comments_of(token)
@@ -181,20 +179,16 @@ class LkmlFormatter:
             case _:
                 t = str(token.value).replace(" ", "")
 
-        return lcomments + t + tcomments
+        return lcomments + self.fmt_indent() + t + tcomments
 
     def fmt_value_pair(self, pair: ParseTree) -> str:
         lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
         tcomments = self.fmt_trailing_comments_of(_token(pair.children[0]))
 
-        key = self.fmt(pair.children[0])
-        value = self.fmt(pair.children[1])
-        return f"{lcomments}{key}:{tcomments} {value}"
+        key = self.fmt(pair.children[0]).lstrip()
+        value = self.fmt(pair.children[1]).lstrip()
 
-    def prepend_indent(self, lines: list[str]) -> None:
-        # https://stackoverflow.com/questions/3000461/python-map-in-place
-        indent = " " * INDENT_WIDTH * self.curr_indent
-        lines[:] = map(lambda line: (indent + line) if line != "" else "", lines)
+        return f"{lcomments}{self.fmt_indent()}{key}:{tcomments} {value}"
 
     # https://stackoverflow.com/questions/49733699/python-type-hints-and-context-managers
     @contextmanager
@@ -220,7 +214,7 @@ class LkmlFormatter:
     def get_trailing_comments(self, token: Token) -> list[Token]:
         comments = []
         idx = 0
-        # line = self.comments[idx].line
+
         while (
             idx < len(self.comments)
             and token.line is not None
@@ -233,11 +227,16 @@ class LkmlFormatter:
             idx += 1  # if self.comments[idx] is leading comments
         return comments
 
+    def fmt_indent(self) -> str:
+        return " " * INDENT_WIDTH * self.curr_indent
+
     def fmt_leading_comments_of(self, token: Token) -> str:
         tokens = self.get_leading_comments(token)
         comments = ""
         if 0 < len(tokens):
-            comments = "".join(map(lambda t: str(t.value).rstrip() + "\n", tokens))
+            comments = "".join(
+                map(lambda t: self.fmt_indent() + str(t.value).rstrip() + "\n", tokens)
+            )
         return comments
 
     def fmt_trailing_comments_of(self, token: Token) -> str:

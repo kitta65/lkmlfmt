@@ -107,8 +107,21 @@ dict: ident {
   }
 }""",
         ),
+        (  # this may be invalid syntax
+            """\
+key: [
+  ident {},
+  ident {},
+]""",
+            """\
+key: [
+  ident {},
+  ident {},
+]""",
+        ),
         # leading comments
         ("# eof", "# eof"),
+        ("# eof ", "# eof"),
         (
             """\
 # comment 1
@@ -205,6 +218,22 @@ sql:
   -- comment
   select 1
 ;;""",
+        ),
+        (
+            """\
+dict: {
+  sql:
+    -- comment
+    select 1
+  ;;
+}""",
+            """\
+dict: {
+  sql:
+    -- comment
+    select 1
+  ;;
+}""",
         ),
         (
             """\
