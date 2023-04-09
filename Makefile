@@ -13,6 +13,5 @@ fmt:
 
 .PHONY: publish
 publish:
-	./scripts/version.py
 	poetry build
 	poetry publish --password ${PYPI_PASSWORD} --username dr666m1

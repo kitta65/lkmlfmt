@@ -17,6 +17,11 @@ jobs:
     if: ${{ github.ref_type == 'tag' }}
     steps:
       - uses: actions/checkout@v3
+      - uses: dr666m1/tag-version-match@main
+        with:
+          file: ./pyproject.toml
+          query: .tool.poetry.version
+          pattern: '^([0-9]+\.[0-9]+\.[0-9]+)$'
       - run: pipx install poetry
       - uses: actions/setup-python@v4
         with:
