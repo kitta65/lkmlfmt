@@ -34,6 +34,21 @@ key: value""",
 key1: parent.child
 key2: value*""",
         ),
+        # string
+        (
+            """\
+dict: {
+  str: "
+multiline
+string"
+}""",
+            """\
+dict: {
+  str: "
+multiline
+string"
+}""",
+        ),
         # arr
         (
             """values: []""",
@@ -92,8 +107,21 @@ dict: ident {
   }
 }""",
         ),
+        (  # this may be invalid syntax
+            """\
+key: [
+  ident {},
+  ident {},
+]""",
+            """\
+key: [
+  ident {},
+  ident {},
+]""",
+        ),
         # leading comments
         ("# eof", "# eof"),
+        ("# eof ", "# eof"),
         (
             """\
 # comment 1
@@ -193,6 +221,22 @@ sql:
         ),
         (
             """\
+dict: {
+  sql:
+    -- comment
+    select 1
+  ;;
+}""",
+            """\
+dict: {
+  sql:
+    -- comment
+    select 1
+  ;;
+}""",
+        ),
+        (
+            """\
 sql:
   select '''multiline string
 
@@ -251,9 +295,21 @@ sql:
         #     """sql: {{ "foo" | append: "bar" }} ;;""",
         # ),
         # html
-        (  # NOTE currently no operation
+        (
             """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
             """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
+        ),
+        (  # TODO
+            """\
+html:
+  <div>
+    <img src="https://example.com/images/{{ value }}.jpg"/>
+  </div>
+;;""",
+            """\
+html: <div>
+    <img src="https://example.com/images/{{ value }}.jpg"/>
+  </div> ;;""",
         ),
     ],
     ids=utils.shorten,
