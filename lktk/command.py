@@ -27,7 +27,9 @@ def run(log_level: str) -> None:
 @click.option(
     "--check",
     is_flag=True,
-    help="Don't update files. Instead, exit with status code 1 if any file should be modefied.",  # noqa: #501
+    help="\
+Don't update files.\
+Instead, exit with status code 1 if any file should be modefied.",
 )
 @click.argument("file", type=click.Path(exists=True, path_type=Path), nargs=-1)
 def format(check: bool, file: list[Path]) -> None:
