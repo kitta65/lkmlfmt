@@ -52,7 +52,7 @@ def format(check: bool, file: list[Path]) -> None:
         modified.append(True)
 
         if check:
-            print_diff(before, after)
+            print_diff(before, after, str(f))
         else:
             f.write_text(after)
 
@@ -82,12 +82,10 @@ def filter_lkml(files: Iterable[Path]) -> Iterable[Path]:
     return res
 
 
-def print_diff(a: str, b: str) -> None:
-    diffs = difflib.unified_diff(a.splitlines(), b.splitlines())
-
-    # skip --- filename +++ filename
-    for _ in range(2):
-        next(diffs)
+def print_diff(a: str, b: str, file: str = "") -> None:
+    diffs = difflib.unified_diff(
+        a.splitlines(), b.splitlines(), fromfile=file, tofile=file
+    )
 
     for d in diffs:
         fg = None
