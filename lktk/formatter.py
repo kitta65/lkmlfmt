@@ -86,12 +86,7 @@ class LkmlFormatter:
             with self.indent():
                 value = _fmt_html(value)
 
-            if "\n" not in value:
-                return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
-
-            return f"""{lcomments}{self.fmt_indent()}{key}:
-{value}
-{self.fmt_indent()};;"""
+            return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
 
         # sql_xxx: ... ;; or expression_xxx: ... ;;
         with self.indent():

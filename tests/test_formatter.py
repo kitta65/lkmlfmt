@@ -295,9 +295,21 @@ sql:
         #     """sql: {{ "foo" | append: "bar" }} ;;""",
         # ),
         # html
-        (  # NOTE currently no operation
+        (
             """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
             """html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;""",
+        ),
+        (  # TODO
+            """\
+html:
+  <div>
+    <img src="https://example.com/images/{{ value }}.jpg"/>
+  </div>
+;;""",
+            """\
+html: <div>
+    <img src="https://example.com/images/{{ value }}.jpg"/>
+  </div> ;;""",
         ),
     ],
     ids=utils.shorten,
