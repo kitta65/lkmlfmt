@@ -34,6 +34,21 @@ key: value""",
 key1: parent.child
 key2: value*""",
         ),
+        # string
+        (
+            """\
+dict: {
+  str: "
+multiline
+string"
+}""",
+            """\
+dict: {
+  str: "
+multiline
+string"
+}""",
+        ),
         # arr
         (
             """values: []""",
