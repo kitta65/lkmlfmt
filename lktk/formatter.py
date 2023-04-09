@@ -154,7 +154,7 @@ class LkmlFormatter:
             else:
                 lines.append(f"{main} {tcomments}")
 
-        return "\n".join(lines)
+        return "\n".join(lines) + "\n"
 
     def fmt_named_dict(self, ndict: ParseTree) -> str:
         name = self.fmt(ndict.children[0]).lstrip()
