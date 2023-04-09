@@ -48,7 +48,7 @@ def format(check: bool, file: list[Path]) -> None:
             modified.append(False)
             continue
 
-        click.echo(f"{file} is modified")
+        click.echo(f"{f} is modified")
         modified.append(True)
 
         if check:
