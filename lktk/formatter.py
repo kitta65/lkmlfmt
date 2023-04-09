@@ -32,15 +32,12 @@ class LkmlFormatter:
     def fmt(
         self,
         tree: ParseTree | Token | list[ParseTree | Token] | None = None,
-        sep: str = "\n",
+        sep: str = "",
     ) -> str:
         t = self.tree if tree is None else tree
 
         if isinstance(t, list):
-            elms = []
-            for elm in t:
-                elms.append(self.fmt(elm))
-            return sep.join(elms)
+            return self.fmt_trees(t, sep)
 
         if isinstance(t, Token):
             return self.fmt_token(t)
@@ -67,7 +64,7 @@ class LkmlFormatter:
             return f"{self.fmt_indent()}[]"
 
         with self.indent():
-            values = self.fmt(arr.children, ",\n")
+            values = self.fmt(arr.children, ",")
 
         if "\n" not in values:
             return f"{self.fmt_indent()}[ {values.lstrip()} ]"
@@ -114,28 +111,8 @@ class LkmlFormatter:
 {self.fmt_indent()}}}"""
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
-        lkml = ""
         stmts = [child for child in lookml.children]
-        for i, s in enumerate(stmts):
-            if i == 0:
-                lkml += self.fmt(s)
-                continue
-
-            # handle blank line
-            prev_line: int | None = stmts[i - 1]._position.end_line  # type: ignore
-            next_line: int | None = s._position.line  # type: ignore
-            if prev_line is None or next_line is None:
-                lkml += "\n"
-                lkml += self.fmt(s)
-                continue
-
-            for _ in filter(
-                lambda s: BLANK_LINE.match(s) is not None,
-                self.lkml.splitlines()[prev_line:next_line],
-            ):
-                lkml += "\n"
-            lkml += "\n"
-            lkml += self.fmt(s)
+        lkml = self.fmt(stmts)
 
         while 0 < len(self.comments):
             # comments may have trailing space
@@ -239,6 +216,43 @@ class LkmlFormatter:
             return ""
         comments = " ".join(map(lambda t: str(t.value).rstrip(), tokens))
         return COMMENT_MARKER + comments + COMMENT_MARKER
+
+    def fmt_trees(self, trees: list[Token | ParseTree], sep: str = "") -> str:
+        joined = ""
+
+        for i, t in enumerate(trees):
+            if i == 0:
+                joined += self.fmt(t)
+                continue
+
+            prev_line: int | None = None
+            next_line: int | None = None
+            if isinstance(t, Token):
+                next_line = t.line
+            else:
+                next_line: int | None = t._position.line  # type: ignore
+
+            prev = trees[i - 1]
+            if isinstance(prev, Token):
+                prev_line = prev.end_line
+            else:
+                prev_line = prev._position.end_line  # type: ignore
+
+            joined += sep
+            if prev_line is None or next_line is None:
+                joined += f"\n{self.fmt(t)}"
+                continue
+
+            for _ in filter(
+                lambda s: BLANK_LINE.match(s) is not None,
+                self.lkml.splitlines()[prev_line:next_line],
+            ):
+                joined += "\n"
+
+            joined += "\n"
+            joined += self.fmt(t)
+
+        return joined
 
 
 def _token(token: Token | ParseTree) -> Token:

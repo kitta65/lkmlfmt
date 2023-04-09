@@ -92,6 +92,24 @@ values: [
 ]
 """,
         ),
+        (
+            """\
+values: [
+  value_a1, value_a2,
+
+  value_b1, value_b2,
+]
+""",
+            """\
+values: [
+  value_a1,
+  value_a2,
+
+  value_b1,
+  value_b2,
+]
+""",
+        ),
         # dict
         (
             """\
@@ -108,6 +126,24 @@ dict: { key: value }
             """\
 dict: {
   key: value
+}
+""",
+        ),
+        (
+            """\
+dict: {
+  key1: value1
+
+
+  key2: value2
+}
+""",
+            """\
+dict: {
+  key1: value1
+
+
+  key2: value2
 }
 """,
         ),
