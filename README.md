@@ -7,12 +7,63 @@ pip install lkmlfmt
 ```
 
 ## CLI
-### format
 Use `lkmlfmt` command to format your LookML file(s).
 For further information, use `--help` option.
 
 ```sh
 lkmlfmt [OPTIONS] [FILE]...
+```
+
+## API
+```python
+from lkmlfmt import fmt
+
+lkml = fmt("""\
+view: view_name {
+  derived_table: {
+    sql:
+    with cte as (
+      select column_name from tablename
+      where ts between current_date()-7 and current_date())
+    select column_name from cte
+    ;;
+  }
+  dimension: column_name {
+    html:
+{% if value == "foo" %}
+<img src="https://example.com/{{ value }}"/>
+{% else %}
+<img src="https://example.com/{{ value }}"/>
+{% endif %} ;;
+  }
+}
+""")
+
+assert lkml == """\
+view: view_name {
+  derived_table: {
+    sql:
+      with
+        cte as (
+          select column_name
+          from tablename
+          where ts between current_date() - 7 and current_date()
+        )
+      select column_name
+      from cte
+    ;;
+  }
+  dimension: column_name {
+    html:
+      {% if value == "foo" %}
+        <img src="https://example.com/{{ value }}"/>
+      {% else %}
+        <img src="https://example.com/{{ value }}"/>
+      {% endif %}
+    ;;
+  }
+}
+"""
 ```
 
 ## GitHub Actions
