@@ -10,20 +10,8 @@ from lkmlfmt.formatter import fmt
 from lkmlfmt.logger import logger
 
 
-@click.group()
-@click.option(
-    "--log-level",
-    type=click.Choice(
-        ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False
-    ),
-    default="WARNING",
-)
-def run(log_level: str) -> None:
-    level = getattr(logging, log_level)
-    logging.basicConfig(level=level)
-
-
 @click.command()
+@click.argument("file", type=click.Path(exists=True, path_type=Path), nargs=-1)
 @click.option(
     "--check",
     is_flag=True,
@@ -31,13 +19,22 @@ def run(log_level: str) -> None:
 Don't update files.\
 Instead, exit with status code 1 if any file should be modefied.",
 )
-@click.argument("file", type=click.Path(exists=True, path_type=Path), nargs=-1)
-def format(check: bool, file: list[Path]) -> None:
+@click.option(
+    "--log-level",
+    type=click.Choice(
+        ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False
+    ),
+    default="WARNING",
+)
+def run(file: list[Path], check: bool, log_level: str) -> None:
     """Format LookML file(s).
 
     FILE is the LookML file(s) to format (directory is also OK).
     Files which does not end with `.lkml` will be ignored.
     """
+    level = getattr(logging, log_level)
+    logging.basicConfig(level=level)
+
     modified: list[bool] = []
 
     for f in filter_lkml(file):
@@ -65,9 +62,6 @@ def format(check: bool, file: list[Path]) -> None:
 
     if n_modified > 0 and check:
         sys.exit(1)
-
-
-run.add_command(format)
 
 
 def filter_lkml(files: Iterable[Path]) -> Iterable[Path]:
