@@ -23,9 +23,9 @@ select
 {% endif %}""",
             """\
 select
-{% set LKTK_MARKER = 0 %}{% if True %}{% set LKTK_MARKER = 0 %} 1
-{% set LKTK_MARKER = 1 %}{% else %}{% set LKTK_MARKER = 1 %} 2
-{% set LKTK_MARKER = 2 %}{% endif %}{% set LKTK_MARKER = 2 %}""",
+{% set LKMLFMT_MARKER = 0 %}{% if True %}{% set LKMLFMT_MARKER = 0 %} 1
+{% set LKMLFMT_MARKER = 1 %}{% else %}{% set LKMLFMT_MARKER = 1 %} 2
+{% set LKMLFMT_MARKER = 2 %}{% endif %}{% set LKMLFMT_MARKER = 2 %}""",
         ),
         # raw
         (
@@ -35,9 +35,9 @@ select {% raw %}
 {% endraw %}
 """,
             """\
-select {% set LKTK_MARKER = 0 %}{% raw %}{% set LKTK_MARKER = 0 %}
+select {% set LKMLFMT_MARKER = 0 %}{% raw %}{% set LKMLFMT_MARKER = 0 %}
 "{{string literal}}"
-{% set LKTK_MARKER = 1 %}{% endraw %}{% set LKTK_MARKER = 1 %}
+{% set LKMLFMT_MARKER = 1 %}{% endraw %}{% set LKMLFMT_MARKER = 1 %}
 """,
         ),
         # multiline
@@ -49,13 +49,13 @@ select {%
   echo x
 %}""",
             """\
-select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %}""",
+select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}{% set LKMLFMT_MARKER = 0 %}""",
         ),
         # comment
         (
             "select {% # comment %} 1",
             """\
-select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %} 1""",
+select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}{% set LKMLFMT_MARKER = 0 %} 1""",
         ),
         (
             """\
@@ -65,17 +65,17 @@ select {%
   # comment
 %} 1""",
             """\
-select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %} 1""",
+select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}{% set LKMLFMT_MARKER = 0 %} 1""",
         ),
         # {{...}}
         (
             "select {{ '1' }}",
-            "select {% set LKTK_MARKER = 0 %}{{ var }}{% set LKTK_MARKER = 0 %}",
+            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}{% set LKMLFMT_MARKER = 0 %}",
         ),
         # ${...}
         (
             "select ${x}",
-            "select {% set LKTK_MARKER = 0 %}{{ var }}{% set LKTK_MARKER = 0 %}",
+            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}{% set LKMLFMT_MARKER = 0 %}",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
@@ -90,7 +90,7 @@ def test_to_jinja_sqlfmt(liquid: str, jinja: str) -> None:
     [
         (
             '<img src="https://example.com/{{ value }}"/>',
-            '<img src="https://example.com/{{ var }}{% set LKTK_MARKER = 0 %}"/>',
+            '<img src="https://example.com/{{ var }}{% set LKMLFMT_MARKER = 0 %}"/>',
         ),
     ],
     ids=utils.shorten,
@@ -108,8 +108,8 @@ def test_to_jinja_djhtml(liquid: str, jinja: str) -> None:
         (
             """\
 select
-  {% set LKTK_MARKER = 0 %}{{ a }}{% set LKTK_MARKER = 0 %},
-  {% set LKTK_MARKER = 1 %} {{ b }} {% set LKTK_MARKER = 1 %},
+  {% set LKMLFMT_MARKER = 0 %}{{ a }}{% set LKMLFMT_MARKER = 0 %},
+  {% set LKMLFMT_MARKER = 1 %} {{ b }} {% set LKMLFMT_MARKER = 1 %},
 """,
             """\
 select
@@ -122,10 +122,10 @@ select
         (
             """\
 select
-  {% set LKTK_MARKER = 0 %}{{ a }}
-  {% set LKTK_MARKER = 0 %},
-  {% set LKTK_MARKER = 1 %} {{ b }}
-  {% set LKTK_MARKER = 1 %},
+  {% set LKMLFMT_MARKER = 0 %}{{ a }}
+  {% set LKMLFMT_MARKER = 0 %},
+  {% set LKMLFMT_MARKER = 1 %} {{ b }}
+  {% set LKMLFMT_MARKER = 1 %},
 """,
             """\
 select
@@ -138,10 +138,10 @@ select
         (
             """\
 select
-  {% set LKTK_MARKER = 0 %}
-  {{ a }}{% set LKTK_MARKER = 0 %},
-  {% set LKTK_MARKER = 1 %}
-  {{ b }} {% set LKTK_MARKER = 1 %},
+  {% set LKMLFMT_MARKER = 0 %}
+  {{ a }}{% set LKMLFMT_MARKER = 0 %},
+  {% set LKMLFMT_MARKER = 1 %}
+  {{ b }} {% set LKMLFMT_MARKER = 1 %},
 """,
             """\
 select
@@ -154,12 +154,12 @@ select
         (
             """\
 select
-  {% set LKTK_MARKER = 0 %}
+  {% set LKMLFMT_MARKER = 0 %}
   {{ a }}
-  {% set LKTK_MARKER = 0 %},
-  {% set LKTK_MARKER = 1 %}
+  {% set LKMLFMT_MARKER = 0 %},
+  {% set LKMLFMT_MARKER = 1 %}
   {{ b }}
-  {% set LKTK_MARKER = 1 %},
+  {% set LKMLFMT_MARKER = 1 %},
 """,
             """\
 select
@@ -171,11 +171,11 @@ select
         ),
         (
             """\
-select {% set LKTK_MARKER = 0 %}
+select {% set LKMLFMT_MARKER = 0 %}
   {{ a }}
-  {% set LKTK_MARKER = 0 %}, {% set LKTK_MARKER = 1 %}
+  {% set LKMLFMT_MARKER = 0 %}, {% set LKMLFMT_MARKER = 1 %}
   {{ b }}
-  {% set LKTK_MARKER = 1 %},
+  {% set LKMLFMT_MARKER = 1 %},
 """,
             """\
 select
@@ -200,7 +200,7 @@ def test_to_liquid_sqlfmt(
     [
         (
             """\
-<img src="https://example.com/{{ a }}{% set LKTK_MARKER = 0 %}"/>
+<img src="https://example.com/{{ a }}{% set LKMLFMT_MARKER = 0 %}"/>
 """,
             """\
 <img src="https://example.com/{{ A }}"/>

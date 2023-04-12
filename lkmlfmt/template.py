@@ -1,9 +1,9 @@
 import re
 from typing import Literal
 
-from lkmlfmt.exception import LktkException
+from lkmlfmt.exception import LkmlfmtException
 
-LIQUID_MARKER = "{{% set LKTK_MARKER = {} %}}"
+LIQUID_MARKER = "{{% set LKMLFMT_MARKER = {} %}}"
 TEMPLATE = re.compile(
     r"""(?P<tag>\{%-?\s*(?P<type>#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\})"""
     + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})"""
@@ -132,7 +132,7 @@ def to_liquid(
         leading, dummy, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
         match = DUMMY.match(dummy)
         if match is None:
-            raise LktkException()
+            raise LkmlfmtException()
 
         if match.group("lead_n") is not None:
             leading = leading.rstrip("\n ") + "\n"
