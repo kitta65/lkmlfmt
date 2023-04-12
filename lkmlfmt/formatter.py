@@ -278,7 +278,7 @@ def _token(token: Token | ParseTree) -> Token:
 
 def _fmt_html(liquid: str) -> str:
     jinja, templates, dummies = template.to_jinja(liquid, "djhtml")
-    jinja: str = DjHTML(jinja).indent(2)
+    jinja = DjHTML(jinja).indent(2)
     liquid = template.to_liquid(jinja, templates, dummies, "djhtml")
     return liquid
 
