@@ -1,4 +1,3 @@
-import weakref
 from pathlib import Path
 from typing import Self
 
@@ -16,15 +15,6 @@ lkml_parser = Lark(
     parser="lalr",
     lexer_callbacks={"COMMENT": comments.append},
 )
-
-
-# TODO remove if not needed
-# https://lark-parser.readthedocs.io/en/latest/recipes.html#keeping-track-of-parents-when-visiting
-class ParentSetter(ParseTreeVisitor):
-    def __default__(self, tree: ParseTree) -> None:
-        for child in tree.children:
-            if isinstance(child, Tree):
-                child._parent = weakref.ref(tree)  # type: ignore
 
 
 class Position:
@@ -82,13 +72,10 @@ class PositionSetter(ParseTreeVisitor):
 
 
 # NOTE don't execute this function asynchronously
-def parse(
-    lkml: str, set_parent: bool = False, set_position: bool = False
-) -> tuple[ParseTree, list[Token]]:
+def parse(lkml: str, set_position: bool = False) -> tuple[ParseTree, list[Token]]:
     comments.clear()
     tree = lkml_parser.parse(lkml)
-    if set_parent:
-        ParentSetter().visit(tree)
+
     if set_position:
         PositionSetter().visit(tree)
     return tree, comments

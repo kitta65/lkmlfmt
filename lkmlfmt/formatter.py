@@ -8,11 +8,11 @@ from lark import ParseTree, Token
 from sqlfmt import api
 from sqlfmt.line import Line
 
-from lktk import parser, template
-from lktk.exception import LktkException
-from lktk.logger import logger
+from lkmlfmt import parser, template
+from lkmlfmt.exception import LkmlfmtException
+from lkmlfmt.logger import logger
 
-COMMENT_MARKER = "#LKTK_MARKER#"
+COMMENT_MARKER = "#LKMLFMT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 BLANK_LINE = re.compile(r"^\s*$")
 INDENT_WIDTH = 2
@@ -59,7 +59,7 @@ class LkmlFormatter:
                 return self.fmt_value_pair(t)
             case _:
                 logger.warning(f"unknown data: {t.data}")
-                raise LktkException()
+                raise LkmlfmtException()
 
     def fmt_arr(self, arr: ParseTree) -> str:
         if arr.children[0] is None:
@@ -273,7 +273,7 @@ class LkmlFormatter:
 def _token(token: Token | ParseTree) -> Token:
     if isinstance(token, Token):
         return token
-    raise LktkException()
+    raise LkmlfmtException()
 
 
 def _fmt_html(html: str) -> str:
@@ -281,7 +281,6 @@ def _fmt_html(html: str) -> str:
     return formatted
 
 
-# TODO format liquid tag and variales
 def _fmt_sql(liquid: str) -> str:
     jinja, templates, *_ = template.to_jinja(liquid)
     # NOTE let's rely on sqlfmt for not only sql but also looker expression!

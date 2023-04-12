@@ -1,4 +1,4 @@
-from lktk.command import run
+from lkmlfmt.command import run
 
 if __name__ == "__main__":
     run()

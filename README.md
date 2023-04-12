@@ -1,18 +1,18 @@
-# Looker Toolkit
-WIP
+# lkmlfmt
+lkmlfmt formats your LookML files including embedded SQL and HTML.
 
 ## Installation
 ```sh
-pip install lktk
+pip install lkmlfmt
 ```
 
 ## CLI
 ### format
-Use `lktk format` command to format your LookML file(s).
+Use `lkmlfmt` command to format your LookML file(s).
 For further information, use `--help` option.
 
 ```sh
-lktk format [OPTIONS] [FILE]...
+lkmlfmt [OPTIONS] [FILE]...
 ```
 
 ## GitHub Actions
@@ -30,9 +30,9 @@ jobs:
           # '>=3.11' is required
           python-version: '3.11'
 
-      # you should specify the version of lktk!
-      - run: pip install lktk
-      - run: lktk format --check path/to/lookml/file/or/directory
+      # you should specify the version of lkmlfmt!
+      - run: pip install lkmlfmt
+      - run: lkmlfmt --check path/to/lookml/file/or/directory
 ```
 
 To format arbitrary branch and create pull request.
@@ -49,9 +49,9 @@ jobs:
           # '>=3.11' is required
           python-version: '3.11'
 
-      # you should specify the version of lktk!
-      - run: pip install lktk
-      - run: lktk format path/to/lookml/file/or/directory
+      # you should specify the version of lkmlfmt!
+      - run: pip install lkmlfmt
+      - run: lkmlfmt path/to/lookml/file/or/directory
 
       # check the documentation especially about workflow permissions
       # https://github.com/marketplace/actions/create-pull-request

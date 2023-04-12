@@ -1,12 +1,12 @@
 [tool.poetry]
-name = "lktk"
+name = "lkmlfmt"
 version = "0.0.2"
 description = ""
 authors = ["dr666m1 <skndr666m1@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.scripts]
-lktk = "lktk.command:run"
+lkmlfmt = "lkmlfmt.command:run"
 
 [tool.poetry.dependencies]
 python = "^3.11"
