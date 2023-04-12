@@ -18,15 +18,6 @@ lkml_parser = Lark(
 )
 
 
-# TODO remove if not needed
-# https://lark-parser.readthedocs.io/en/latest/recipes.html#keeping-track-of-parents-when-visiting
-class ParentSetter(ParseTreeVisitor):
-    def __default__(self, tree: ParseTree) -> None:
-        for child in tree.children:
-            if isinstance(child, Tree):
-                child._parent = weakref.ref(tree)  # type: ignore
-
-
 class Position:
     line: int | None
     column: int | None
