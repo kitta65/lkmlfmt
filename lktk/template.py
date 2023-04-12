@@ -1,4 +1,5 @@
 import re
+from typing import Literal
 
 from lktk.exception import LktkException
 
@@ -10,8 +11,10 @@ TEMPLATE = re.compile(
 )
 DUMMY = re.compile(r"^(?P<lead_n> *?\n)?(?P<indent> *)")
 
+MODE = Literal["sqlfmt", "djhtml"]
 
-def to_jinja(liquid: str) -> tuple[str, list[str]]:
+
+def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str]]:
     jinja = ""
     templates = []
     id_ = 0
@@ -103,7 +106,11 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
 
         # append results
         marker = LIQUID_MARKER.format(id_)
-        jinja += f"{liquid[: match.start()]}{marker}{dummy}{marker}"
+        if mode == "sqlfmt":
+            jinja += f"{liquid[: match.start()]}{marker}{dummy}{marker}"
+        else:
+            jinja += f"{liquid[: match.start()]}{dummy}{marker}"
+
         templates.append(match.group(0))
 
         # prepare for next iteration
@@ -113,7 +120,10 @@ def to_jinja(liquid: str) -> tuple[str, list[str]]:
     return jinja, templates
 
 
-def to_liquid(jinja: str, tags: list[str]) -> str:
+def to_liquid(jinja: str, tags: list[str], mode: MODE = "sqlfmt") -> str:
+    if mode == "djhtml":
+        return temp(jinja, tags, mode)
+
     for i, tag in enumerate(tags):
         leading, dummy, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
         match = DUMMY.match(dummy)
@@ -126,3 +136,7 @@ def to_liquid(jinja: str, tags: list[str]) -> str:
 
         jinja = leading + tag + trailing
     return jinja
+
+
+def temp(jinja: str, tags: list[str], mode: MODE = "sqlfmt") -> str:
+    return "aaa"

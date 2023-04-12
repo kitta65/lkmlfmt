@@ -80,8 +80,23 @@ select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %} 1""",
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
 )
-def test_to_jinja(liquid: str, jinja: str) -> None:
+def test_to_jinja_sqlfmt(liquid: str, jinja: str) -> None:
     res, _ = to_jinja(liquid)
+    assert res == jinja
+
+
+@pytest.mark.parametrize(
+    "liquid,jinja",
+    [
+        (
+            '<img src="https://example.com/{{ value }}"/>',
+            '<img src="https://example.com/{{ var }}{% set LKTK_MARKER = 0 %}"/>',
+        ),
+    ],
+    ids=utils.shorten,
+)
+def test_to_jinja_djhtml(liquid: str, jinja: str) -> None:
+    res, _ = to_jinja(liquid, "djhtml")
     assert res == jinja
 
 
@@ -168,6 +183,6 @@ select
     ],
     ids=utils.shorten,
 )
-def test_to_liquid(jinja: str, liquid: str, tags: list[str]) -> None:
+def test_to_liquid_sqlfmt(jinja: str, liquid: str, tags: list[str]) -> None:
     res = to_liquid(jinja, tags)
     assert res == liquid
