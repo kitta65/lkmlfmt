@@ -276,9 +276,11 @@ def _token(token: Token | ParseTree) -> Token:
     raise LkmlfmtException()
 
 
-def _fmt_html(html: str) -> str:
-    formatted: str = DjHTML(html).indent(2)
-    return formatted
+def _fmt_html(liquid: str) -> str:
+    jinja, templates, dummies = template.to_jinja(liquid, "djhtml")
+    jinja: str = DjHTML(jinja).indent(2)
+    liquid = template.to_liquid(jinja, templates, dummies, "djhtml")
+    return liquid
 
 
 def _fmt_sql(liquid: str) -> str:
