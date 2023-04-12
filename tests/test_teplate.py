@@ -9,7 +9,7 @@ from tests import utils
 @pytest.mark.parametrize(
     "liquid,jinja",
     [
-        # no tag
+        # no template
         (
             "select 1",
             "select 1",
@@ -81,7 +81,7 @@ select {% set LKTK_MARKER = 0 %}{% set x = 'x' %}{% set LKTK_MARKER = 0 %} 1""",
     ids=lambda x: re.sub(r"\s+", " ", x),
 )
 def test_to_jinja_sqlfmt(liquid: str, jinja: str) -> None:
-    res, _ = to_jinja(liquid)
+    res, *_ = to_jinja(liquid)
     assert res == jinja
 
 
@@ -96,15 +96,15 @@ def test_to_jinja_sqlfmt(liquid: str, jinja: str) -> None:
     ids=utils.shorten,
 )
 def test_to_jinja_djhtml(liquid: str, jinja: str) -> None:
-    res, _ = to_jinja(liquid, "djhtml")
+    res, *_ = to_jinja(liquid, "djhtml")
     assert res == jinja
 
 
 @pytest.mark.parametrize(
-    "jinja,liquid,tags",
+    "jinja,liquid,templates,dummies",
     [
         # no template
-        ("select 1", "select 1", []),
+        ("select 1", "select 1", [], []),
         (
             """\
 select
@@ -117,6 +117,7 @@ select
   {{ B }},
 """,
             ["{{ A }}", "{{ B }}"],
+            ["{{ a }}", "{{ b }}"],
         ),
         (
             """\
@@ -132,6 +133,7 @@ select
   {{ B }},
 """,
             ["{{ A }}", "{{ B }}"],
+            ["{{ a }}", "{{ b }}"],
         ),
         (
             """\
@@ -147,6 +149,7 @@ select
   {{ B }},
 """,
             ["{{ A }}", "{{ B }}"],
+            ["{{ a }}", "{{ b }}"],
         ),
         (
             """\
@@ -164,6 +167,7 @@ select
   {{ B }},
 """,
             ["{{ A }}", "{{ B }}"],
+            ["{{ a }}", "{{ b }}"],
         ),
         (
             """\
@@ -179,10 +183,36 @@ select
   {{ B }},
 """,
             ["{{ A }}", "{{ B }}"],
+            ["{{ a }}", "{{ b }}"],
         ),
     ],
     ids=utils.shorten,
 )
-def test_to_liquid_sqlfmt(jinja: str, liquid: str, tags: list[str]) -> None:
-    res = to_liquid(jinja, tags)
+def test_to_liquid_sqlfmt(
+    jinja: str, liquid: str, templates: list[str], dummies: list[str]
+) -> None:
+    res = to_liquid(jinja, templates, dummies)
+    assert res == liquid
+
+
+@pytest.mark.parametrize(
+    "jinja,liquid,templates,dummies",
+    [
+        (
+            """\
+<img src="https://example.com/{{ a }}{% set LKTK_MARKER = 0 %}"/>
+""",
+            """\
+<img src="https://example.com/{{ A }}"/>
+""",
+            ["{{ A }}"],
+            ["{{ a }}"],
+        ),
+    ],
+    ids=utils.shorten,
+)
+def test_to_liquid_djhtml(
+    jinja: str, liquid: str, templates: list[str], dummies: list[str]
+) -> None:
+    res = to_liquid(jinja, templates, dummies, "djhtml")
     assert res == liquid

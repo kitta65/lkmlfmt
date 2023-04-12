@@ -14,9 +14,10 @@ DUMMY = re.compile(r"^(?P<lead_n> *?\n)?(?P<indent> *)")
 MODE = Literal["sqlfmt", "djhtml"]
 
 
-def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str]]:
+def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[str]]:
     jinja = ""
     templates = []
+    dummies = []
     id_ = 0
     skip_to: str | None = None
 
@@ -112,19 +113,22 @@ def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str]]:
             jinja += f"{liquid[: match.start()]}{dummy}{marker}"
 
         templates.append(match.group(0))
+        dummies.append(dummy)
 
         # prepare for next iteration
         liquid = liquid[match.end() :]
         id_ += 1
 
-    return jinja, templates
+    return jinja, templates, dummies
 
 
-def to_liquid(jinja: str, tags: list[str], mode: MODE = "sqlfmt") -> str:
+def to_liquid(
+    jinja: str, templates: list[str], dummies: list[str], mode: MODE = "sqlfmt"
+) -> str:
     if mode == "djhtml":
-        return temp(jinja, tags, mode)
+        return to_liquid_djhtml(jinja, templates, dummies)
 
-    for i, tag in enumerate(tags):
+    for i, template in enumerate(templates):
         leading, dummy, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
         match = DUMMY.match(dummy)
         if match is None:
@@ -132,11 +136,21 @@ def to_liquid(jinja: str, tags: list[str], mode: MODE = "sqlfmt") -> str:
 
         if match.group("lead_n") is not None:
             leading = leading.rstrip("\n ") + "\n"
-            tag = match.group("indent") + tag
+            template = match.group("indent") + template
 
-        jinja = leading + tag + trailing
+        jinja = leading + template + trailing
     return jinja
 
 
-def temp(jinja: str, tags: list[str], mode: MODE = "sqlfmt") -> str:
-    return "aaa"
+def to_liquid_djhtml(jinja: str, templates: list[str], dummies: list[str]) -> str:
+    liquid = ""
+    trailing = ""
+
+    for i in range(len(templates)):
+        leading, trailing, *_ = jinja.split(f"{dummies[i]}{LIQUID_MARKER.format(i)}")
+        liquid += TEMPLATE.split(leading)[0]  # remove dummy
+        liquid += templates[i]
+        jinja = trailing
+
+    liquid += trailing
+    return liquid
