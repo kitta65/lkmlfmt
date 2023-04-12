@@ -16,6 +16,8 @@ lkmlfmt [OPTIONS] [FILE]...
 
 ## API
 ```python
+from lkmlfmt import fmt
+
 lkml = fmt("""\
 view: view_name {
   derived_table: {
