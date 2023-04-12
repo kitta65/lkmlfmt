@@ -1,4 +1,3 @@
-import weakref
 from pathlib import Path
 from typing import Self
 
@@ -73,13 +72,10 @@ class PositionSetter(ParseTreeVisitor):
 
 
 # NOTE don't execute this function asynchronously
-def parse(
-    lkml: str, set_parent: bool = False, set_position: bool = False
-) -> tuple[ParseTree, list[Token]]:
+def parse(lkml: str, set_position: bool = False) -> tuple[ParseTree, list[Token]]:
     comments.clear()
     tree = lkml_parser.parse(lkml)
-    if set_parent:
-        ParentSetter().visit(tree)
+
     if set_position:
         PositionSetter().visit(tree)
     return tree, comments

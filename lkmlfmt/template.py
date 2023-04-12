@@ -1,7 +1,7 @@
 import re
 from typing import Literal
 
-from lktk.exception import LktkException
+from lkmlfmt.exception import LktkException
 
 LIQUID_MARKER = "{{% set LKTK_MARKER = {} %}}"
 TEMPLATE = re.compile(

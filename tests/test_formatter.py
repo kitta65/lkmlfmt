@@ -1,6 +1,6 @@
 import pytest
 
-from lktk.formatter import fmt
+from lkmlfmt.formatter import fmt
 from tests import utils
 
 

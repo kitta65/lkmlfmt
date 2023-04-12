@@ -1,6 +1,6 @@
 import pytest
 
-from lktk.parser import lkml_parser
+from lkmlfmt.parser import lkml_parser
 from tests import utils
 
 

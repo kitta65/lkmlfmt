@@ -6,8 +6,8 @@ from pathlib import Path
 
 import click
 
-from lktk.formatter import fmt
-from lktk.logger import logger
+from lkmlfmt.formatter import fmt
+from lkmlfmt.logger import logger
 
 
 @click.group()

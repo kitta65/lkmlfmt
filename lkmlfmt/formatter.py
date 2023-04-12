@@ -8,9 +8,9 @@ from lark import ParseTree, Token
 from sqlfmt import api
 from sqlfmt.line import Line
 
-from lktk import parser, template
-from lktk.exception import LktkException
-from lktk.logger import logger
+from lkmlfmt import parser, template
+from lkmlfmt.exception import LktkException
+from lkmlfmt.logger import logger
 
 COMMENT_MARKER = "#LKTK_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")

@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from lktk.template import to_jinja, to_liquid
+from lkmlfmt.template import to_jinja, to_liquid
 from tests import utils
 
 
