@@ -31,9 +31,9 @@ view: view_name {
   dimension: column_name {
     html:
 {% if value == "foo" %}
-<img src="https://example.com/{{ value }}"/>
+<img src="https://example.com/foo"/>
 {% else %}
-<img src="https://example.com/{{ value }}"/>
+<img src="https://example.com/bar"/>
 {% endif %} ;;
   }
 }
@@ -56,9 +56,9 @@ view: view_name {
   dimension: column_name {
     html:
       {% if value == "foo" %}
-        <img src="https://example.com/{{ value }}"/>
+        <img src="https://example.com/foo"/>
       {% else %}
-        <img src="https://example.com/{{ value }}"/>
+        <img src="https://example.com/bar"/>
       {% endif %}
     ;;
   }
