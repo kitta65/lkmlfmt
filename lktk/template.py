@@ -148,8 +148,7 @@ def to_liquid_djhtml(jinja: str, templates: list[str], dummies: list[str]) -> st
 
     for i in range(len(templates)):
         leading, trailing, *_ = jinja.split(f"{dummies[i]}{LIQUID_MARKER.format(i)}")
-        liquid += TEMPLATE.split(leading)[0]  # remove dummy
-        liquid += templates[i]
+        liquid += leading + templates[i]
         jinja = trailing
 
     liquid += trailing
