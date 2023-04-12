@@ -403,18 +403,24 @@ html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;
 html: <img src="https://example.com/images/{{ value }}.jpg"/> ;;
 """,
         ),
-        (  # TODO
+        (
             """\
+dict: {
 html:
-  <div>
-    <img src="https://example.com/images/{{ value }}.jpg"/>
-  </div>
+<div>
+<img src="https://example.com/images/{{ value }}.jpg"/>
+</div>
 ;;
+}
 """,
             """\
-html: <div>
-    <img src="https://example.com/images/{{ value }}.jpg"/>
-  </div> ;;
+dict: {
+  html:
+    <div>
+      <img src="https://example.com/images/{{ value }}.jpg"/>
+    </div>
+  ;;
+}
 """,
         ),
     ],

@@ -1,7 +1,9 @@
 import re
 from contextlib import contextmanager
-from typing import Generator
+from typing import Any, Generator
 
+from djhtml.lines import Line as DjHTMLLine  # type: ignore
+from djhtml.modes import DjHTML  # type: ignore
 from lark import ParseTree, Token
 from sqlfmt import api
 from sqlfmt.line import Line
@@ -80,9 +82,22 @@ class LkmlFormatter:
 
         if key == "html":
             with self.indent():
+                indent = self.curr_indent
+                f: Any = (
+                    lambda s, w: " " * (w * (s.level + indent) + s.offset) + t
+                    if (t := s.text.strip())
+                    else t
+                )
+                # https://github.com/rtts/djhtml/blob/main/djhtml/lines.py
+                DjHTMLLine.indent = f
                 value = _fmt_html(value)
 
-            return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
+            if "\n" not in value:
+                return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
+
+            return f"""{lcomments}{self.fmt_indent()}{key}:
+{value}
+{self.fmt_indent()};;"""
 
         # sql_xxx: ... ;; or expression_xxx: ... ;;
         with self.indent():
@@ -95,7 +110,7 @@ class LkmlFormatter:
         if "\n" not in value:
             return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
 
-        return f"""{lcomments}{self.fmt_indent()}{key.strip()}:
+        return f"""{lcomments}{self.fmt_indent()}{key}:
 {value}
 {self.fmt_indent()};;"""
 
@@ -261,17 +276,17 @@ def _token(token: Token | ParseTree) -> Token:
     raise LktkException()
 
 
-# TODO
 def _fmt_html(html: str) -> str:
-    return html
+    formatted: str = DjHTML(html).indent(2)
+    return formatted
 
 
 # TODO format liquid tag and variales
 def _fmt_sql(liquid: str) -> str:
-    jinja, templates = template.to_jinja(liquid)
+    jinja, templates, *_ = template.to_jinja(liquid)
     # NOTE let's rely on sqlfmt for not only sql but also looker expression!
     jinja = api.format_string(jinja, mode=MODE).rstrip()
-    liquid = template.to_liquid(jinja, templates)
+    liquid = template.to_liquid(jinja, templates, [])
     return liquid
 
 
