@@ -120,15 +120,6 @@ def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[s
     return jinja, templates, dummies
 
 
-def to_liquid(
-    jinja: str, templates: list[str], dummies: list[str], mode: MODE = "sqlfmt"
-) -> str:
-    if mode == "djhtml":
-        return to_liquid_djhtml(jinja, templates, dummies)
-    else:
-        return to_liquid_sqlfmt(jinja, templates, dummies)
-
-
 def to_liquid_sqlfmt(jinja: str, templates: list[str], dummies: list[str]) -> str:
     for i in range(len(templates)):
         leading, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))

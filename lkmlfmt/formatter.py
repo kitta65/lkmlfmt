@@ -15,6 +15,9 @@ from lkmlfmt.logger import logger
 COMMENT_MARKER = "#LKMLFMT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 BLANK_LINE = re.compile(r"^\s*$")
+ESCAPED_STRING_SINGLE = re.compile(r'"(?P<inner>(.|\n)*?(?<!\\)(\\\\)*?)"')
+ESCAPED_STRING_TRIPLE = re.compile(r'"""(?P<inner>(.|\n)*?(?<!\\)(\\\\)*?)"""')
+NOT_AND_OR = re.compile(r"(?<!\w)(not|and|or)(?!\w)")
 INDENT_WIDTH = 2
 MODE = api.Mode()
 
@@ -80,7 +83,7 @@ class LkmlFormatter:
         key = self.fmt(pair.children[0]).lstrip()
         value = str(pair.children[1])
 
-        if key == "html":
+        if key.startswith("html"):
             with self.indent():
                 indent = self.curr_indent
                 f: Any = (
@@ -105,7 +108,10 @@ class LkmlFormatter:
             Line.prefix = property(  # type: ignore
                 lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
             )
-            value = _fmt_sql(value)
+            if key.startswith("sql"):
+                value = _fmt_sql(value)
+            else:
+                value = _fmt_expr(value)
 
         if "\n" not in value:
             return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
@@ -279,16 +285,43 @@ def _token(token: Token | ParseTree) -> Token:
 def _fmt_html(liquid: str) -> str:
     jinja, templates, dummies = template.to_jinja(liquid, "djhtml")
     jinja = DjHTML(jinja).indent(2)
-    liquid = template.to_liquid(jinja, templates, dummies, "djhtml")
+    liquid = template.to_liquid_djhtml(jinja, templates, dummies)
     return liquid
 
 
 def _fmt_sql(liquid: str) -> str:
-    jinja, templates, dummies = template.to_jinja(liquid)
-    # NOTE let's rely on sqlfmt for not only sql but also looker expression!
+    jinja, templates, dummies = template.to_jinja(liquid, "sqlfmt")
     jinja = api.format_string(jinja, mode=MODE).rstrip()
-    liquid = template.to_liquid(jinja, templates, dummies)
+    liquid = template.to_liquid_sqlfmt(jinja, templates, dummies)
     return liquid
+
+
+# NOTE let's rely on sqlfmt for not only sql but also looker expression!
+def _fmt_expr(liquid: str) -> str:
+    # convert looker expr into sql
+    temp = liquid
+    temp = temp.replace("case", "lkmlfmt_case")
+    temp = temp.replace("when", "lkmlfmt_when")
+    temp = ESCAPED_STRING_SINGLE.sub(r'"""\g<inner>"""', temp)  # " -> """
+
+    temp = _fmt_sql(temp)
+
+    # convert sql into looker expression
+    temp = ESCAPED_STRING_TRIPLE.sub(r'"\g<inner>"', temp)
+    temp = temp.replace("lkmlfmt_when", "when")
+    temp = temp.replace("lkmlfmt_case", "case")
+
+    splited = ESCAPED_STRING_SINGLE.split(temp)
+    expr = ""
+    for i, s in enumerate(splited):
+        match divmod(i, 4)[1]:  # mod
+            case 0:
+                uppered = NOT_AND_OR.sub(lambda x: x.group(0).upper(), s)
+                expr += uppered
+            case 1:
+                expr += f'"{s}"'
+
+    return expr
 
 
 def fmt(lkml: str) -> str:
