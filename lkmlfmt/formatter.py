@@ -116,6 +116,9 @@ class LkmlFormatter:
         if "\n" not in value:
             return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
 
+        if not value.startswith(" "):  # fallback if sqlfmt does not support
+            value = " " * ((self.curr_indent + 1) * INDENT_WIDTH) + value
+
         return f"""{lcomments}{self.fmt_indent()}{key}:
 {value}
 {self.fmt_indent()};;"""

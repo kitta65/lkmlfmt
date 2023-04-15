@@ -382,6 +382,26 @@ sql:
 ;;
 """,  # {% else %} ${monthly.SQL_TABLE_NAME} is printed in single line by sqlfmt
         ),
+        (
+            """\
+sql:
+  create or replace model modelname
+  options (
+    foo="bar"
+  ) as
+  select * tablename
+;;
+""",  # statement which is not supported by sqlfmt
+            """\
+sql:
+  create or replace model modelname
+  options (
+    foo="bar"
+  ) as
+  select * tablename
+;;
+""",
+        ),
         # template
         # TODO
         # (
