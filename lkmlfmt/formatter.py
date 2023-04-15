@@ -19,17 +19,17 @@ ESCAPED_STRING_SINGLE = re.compile(r'"(?P<inner>(.|\n)*?(?<!\\)(\\\\)*?)"')
 ESCAPED_STRING_TRIPLE = re.compile(r'"""(?P<inner>(.|\n)*?(?<!\\)(\\\\)*?)"""')
 NOT_AND_OR = re.compile(r"(?<!\w)(not|and|or)(?!\w)")
 INDENT_WIDTH = 2
-MODE = api.Mode()
 
 
 class LkmlFormatter:
-    def __init__(self, lkml: str) -> None:
+    def __init__(self, lkml: str, clickhouse: bool) -> None:
         self.lkml = lkml
         self.curr_indent = 0
 
         tree, comments = parser.parse(lkml, set_position=True)
         self.tree = tree
         self.comments = comments
+        self.mode = api.Mode(dialect_name="clickhouse" if clickhouse else "polyglot")
 
     # NOTE
     # parents take care of self.curr_indent, but children call fmt_indent()
@@ -109,9 +109,9 @@ class LkmlFormatter:
                 lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
             )
             if key.startswith("sql"):
-                value = _fmt_sql(value)
+                value = self._fmt_sql(value)
             else:
-                value = _fmt_expr(value)
+                value = self._fmt_expr(value)
 
         if "\n" not in value:
             return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
@@ -278,6 +278,39 @@ class LkmlFormatter:
 
         return joined
 
+    def _fmt_sql(self, liquid: str) -> str:
+        jinja, templates, dummies = template.to_jinja(liquid, "sqlfmt")
+        jinja = api.format_string(jinja, mode=self.mode).rstrip()
+        liquid = template.to_liquid_sqlfmt(jinja, templates, dummies)
+        return liquid
+
+    # NOTE let's rely on sqlfmt for not only sql but also looker expression!
+    def _fmt_expr(self, liquid: str) -> str:
+        # convert looker expr into sql
+        temp = liquid
+        temp = temp.replace("case", "lkmlfmt_case")
+        temp = temp.replace("when", "lkmlfmt_when")
+        temp = ESCAPED_STRING_SINGLE.sub(r'"""\g<inner>"""', temp)  # " -> """
+
+        temp = self._fmt_sql(temp)
+
+        # convert sql into looker expression
+        temp = ESCAPED_STRING_TRIPLE.sub(r'"\g<inner>"', temp)
+        temp = temp.replace("lkmlfmt_when", "when")
+        temp = temp.replace("lkmlfmt_case", "case")
+
+        splited = ESCAPED_STRING_SINGLE.split(temp)
+        expr = ""
+        for i, s in enumerate(splited):
+            match divmod(i, 4)[1]:  # mod
+                case 0:
+                    uppered = NOT_AND_OR.sub(lambda x: x.group(0).upper(), s)
+                    expr += uppered
+                case 1:
+                    expr += f'"{s}"'
+
+        return expr
+
 
 def _token(token: Token | ParseTree) -> Token:
     if isinstance(token, Token):
@@ -292,41 +325,6 @@ def _fmt_html(liquid: str) -> str:
     return liquid
 
 
-def _fmt_sql(liquid: str) -> str:
-    jinja, templates, dummies = template.to_jinja(liquid, "sqlfmt")
-    jinja = api.format_string(jinja, mode=MODE).rstrip()
-    liquid = template.to_liquid_sqlfmt(jinja, templates, dummies)
-    return liquid
-
-
-# NOTE let's rely on sqlfmt for not only sql but also looker expression!
-def _fmt_expr(liquid: str) -> str:
-    # convert looker expr into sql
-    temp = liquid
-    temp = temp.replace("case", "lkmlfmt_case")
-    temp = temp.replace("when", "lkmlfmt_when")
-    temp = ESCAPED_STRING_SINGLE.sub(r'"""\g<inner>"""', temp)  # " -> """
-
-    temp = _fmt_sql(temp)
-
-    # convert sql into looker expression
-    temp = ESCAPED_STRING_TRIPLE.sub(r'"\g<inner>"', temp)
-    temp = temp.replace("lkmlfmt_when", "when")
-    temp = temp.replace("lkmlfmt_case", "case")
-
-    splited = ESCAPED_STRING_SINGLE.split(temp)
-    expr = ""
-    for i, s in enumerate(splited):
-        match divmod(i, 4)[1]:  # mod
-            case 0:
-                uppered = NOT_AND_OR.sub(lambda x: x.group(0).upper(), s)
-                expr += uppered
-            case 1:
-                expr += f'"{s}"'
-
-    return expr
-
-
-def fmt(lkml: str) -> str:
-    formatter = LkmlFormatter(lkml)
+def fmt(lkml: str, clickhouse: bool) -> str:
+    formatter = LkmlFormatter(lkml, clickhouse)
     return formatter.fmt()

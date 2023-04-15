@@ -20,13 +20,18 @@ Don't update files.\
 Instead, exit with status code 1 if any file should be modefied.",
 )
 @click.option(
+    "--clickhouse",
+    is_flag=True,
+    help="Specify `--dialect clickhouse` option when using sqlfmt.",
+)
+@click.option(
     "--log-level",
     type=click.Choice(
         ["DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"], case_sensitive=False
     ),
     default="WARNING",
 )
-def run(file: list[Path], check: bool, log_level: str) -> None:
+def run(file: list[Path], check: bool, clickhouse: bool, log_level: str) -> None:
     """Format LookML file(s).
 
     FILE is the LookML file(s) to format (directory is also OK).
@@ -40,7 +45,7 @@ def run(file: list[Path], check: bool, log_level: str) -> None:
     for f in filter_lkml(file):
         logger.debug(f"formatting {f}")
         before = f.read_text()
-        after = fmt(before)
+        after = fmt(before, clickhouse)
 
         if before == after:
             click.echo(f"{f} is skipped")

@@ -489,11 +489,31 @@ dict: {
     ],
     ids=utils.shorten,
 )
-def test_formatter(input_: str, output: str) -> None:
+def test_formatter_polyglot(input_: str, output: str) -> None:
     # once formatted text matches expected output
-    text1 = fmt(input_)
+    text1 = fmt(input_, clickhouse=False)
     assert text1 == output
 
     # twice formatted text also matches expected output
-    text2 = fmt(text1)
+    text2 = fmt(text1, clickhouse=False)
+    assert text2 == output
+
+
+@pytest.mark.parametrize(
+    "input_, output",
+    [
+        (
+            "sql: select camelCase from UPPER_CASE ;;\n",
+            "sql: select camelCase from UPPER_CASE ;;\n",
+        ),
+    ],
+    ids=utils.shorten,
+)
+def test_formatter_clickhouse(input_: str, output: str) -> None:
+    # once formatted text matches expected output
+    text1 = fmt(input_, clickhouse=True)
+    assert text1 == output
+
+    # twice formatted text also matches expected output
+    text2 = fmt(text1, clickhouse=True)
     assert text2 == output
