@@ -369,8 +369,10 @@ sql:
     temp as (
       select ts, col1, col2, col3
       from
-        {% if ts_date._in_query %} ${daily.SQL_TABLE_NAME}
-        {% elsif ts_week._in_query %} ${weekly.SQL_TABLE_NAME}
+        {% if ts_date._in_query %}
+        ${daily.SQL_TABLE_NAME}
+        {% elsif ts_week._in_query %}
+        ${weekly.SQL_TABLE_NAME}
         {% else %} ${monthly.SQL_TABLE_NAME}
         {% endif %}
     )
@@ -378,7 +380,7 @@ sql:
   from temp
   where staff_id = '{{ _user_attributes['staff_id'] }}'
 ;;
-""",
+""",  # {% else %} ${monthly.SQL_TABLE_NAME} is printed in single line by sqlfmt
         ),
         # template
         # TODO

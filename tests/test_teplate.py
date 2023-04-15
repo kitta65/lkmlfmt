@@ -23,9 +23,9 @@ select
 {% endif %}""",
             """\
 select
-{% set LKMLFMT_MARKER = 0 %}{% if True %}{% set LKMLFMT_MARKER = 0 %} 1
-{% set LKMLFMT_MARKER = 1 %}{% else %}{% set LKMLFMT_MARKER = 1 %} 2
-{% set LKMLFMT_MARKER = 2 %}{% endif %}{% set LKMLFMT_MARKER = 2 %}""",
+{% set LKMLFMT_MARKER = 0 %}{% if True %} 1
+{% set LKMLFMT_MARKER = 1 %}{% else %} 2
+{% set LKMLFMT_MARKER = 2 %}{% endif %}""",
         ),
         # raw
         (
@@ -35,9 +35,9 @@ select {% raw %}
 {% endraw %}
 """,
             """\
-select {% set LKMLFMT_MARKER = 0 %}{% raw %}{% set LKMLFMT_MARKER = 0 %}
+select {% set LKMLFMT_MARKER = 0 %}{% raw %}
 "{{string literal}}"
-{% set LKMLFMT_MARKER = 1 %}{% endraw %}{% set LKMLFMT_MARKER = 1 %}
+{% set LKMLFMT_MARKER = 1 %}{% endraw %}
 """,
         ),
         # multiline
@@ -49,13 +49,13 @@ select {%
   echo x
 %}""",
             """\
-select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}{% set LKMLFMT_MARKER = 0 %}""",
+select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}""",
         ),
         # comment
         (
             "select {% # comment %} 1",
             """\
-select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}{% set LKMLFMT_MARKER = 0 %} 1""",
+select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %} 1""",
         ),
         (
             """\
@@ -65,17 +65,17 @@ select {%
   # comment
 %} 1""",
             """\
-select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}{% set LKMLFMT_MARKER = 0 %} 1""",
+select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %} 1""",
         ),
         # {{...}}
         (
             "select {{ '1' }}",
-            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}{% set LKMLFMT_MARKER = 0 %}",
+            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}",
         ),
         # ${...}
         (
             "select ${x}",
-            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}{% set LKMLFMT_MARKER = 0 %}",
+            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}",
         ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
@@ -107,14 +107,12 @@ def test_to_jinja_djhtml(liquid: str, jinja: str) -> None:
         ("select 1", "select 1", [], []),
         (
             """\
-select
-  {% set LKMLFMT_MARKER = 0 %}{{ a }}{% set LKMLFMT_MARKER = 0 %},
-  {% set LKMLFMT_MARKER = 1 %} {{ b }} {% set LKMLFMT_MARKER = 1 %},
+select {% set LKMLFMT_MARKER = 0 %}{{ a }};
+select {% set LKMLFMT_MARKER = 1 %} {{ b }};
 """,
             """\
-select
-  {{ A }},
-  {{ B }},
+select {{ A }};
+select {{ B }};
 """,
             ["{{ A }}", "{{ B }}"],
             ["{{ a }}", "{{ b }}"],
@@ -122,26 +120,8 @@ select
         (
             """\
 select
-  {% set LKMLFMT_MARKER = 0 %}{{ a }}
-  {% set LKMLFMT_MARKER = 0 %},
-  {% set LKMLFMT_MARKER = 1 %} {{ b }}
-  {% set LKMLFMT_MARKER = 1 %},
-""",
-            """\
-select
-  {{ A }},
-  {{ B }},
-""",
-            ["{{ A }}", "{{ B }}"],
-            ["{{ a }}", "{{ b }}"],
-        ),
-        (
-            """\
-select
-  {% set LKMLFMT_MARKER = 0 %}
-  {{ a }}{% set LKMLFMT_MARKER = 0 %},
-  {% set LKMLFMT_MARKER = 1 %}
-  {{ b }} {% set LKMLFMT_MARKER = 1 %},
+  {% set LKMLFMT_MARKER = 0 %}{{ a }},
+  {% set LKMLFMT_MARKER = 1 %} {{ b }},
 """,
             """\
 select
@@ -155,11 +135,9 @@ select
             """\
 select
   {% set LKMLFMT_MARKER = 0 %}
-  {{ a }}
-  {% set LKMLFMT_MARKER = 0 %},
+  {{ a }},
   {% set LKMLFMT_MARKER = 1 %}
-  {{ b }}
-  {% set LKMLFMT_MARKER = 1 %},
+  {{ b }},
 """,
             """\
 select
@@ -172,10 +150,8 @@ select
         (
             """\
 select {% set LKMLFMT_MARKER = 0 %}
-  {{ a }}
-  {% set LKMLFMT_MARKER = 0 %}, {% set LKMLFMT_MARKER = 1 %}
-  {{ b }}
-  {% set LKMLFMT_MARKER = 1 %},
+  {{ a }}, {% set LKMLFMT_MARKER = 1 %}
+  {{ b }},
 """,
             """\
 select

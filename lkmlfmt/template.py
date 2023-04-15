@@ -1,8 +1,6 @@
 import re
 from typing import Literal
 
-from lkmlfmt.exception import LkmlfmtException
-
 LIQUID_MARKER = "{{% set LKMLFMT_MARKER = {} %}}"
 TEMPLATE = re.compile(
     r"""(?P<tag>\{%-?\s*(?P<type>#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\})"""
@@ -62,10 +60,10 @@ def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[s
                 dummy = "{% endfor %}"
             # template https://shopify.github.io/liquid/tags/template/
             case "comment":
-                dummy = "{% if False %}{% raw %}"
+                dummy = "{% raw %}"
                 skip_to = "endcomment"
             case "endcomment":
-                dummy = "{% endraw %}{% endif %}"
+                dummy = "{% endraw %}"
             case "#":
                 dummy = "{% set x = 'x' %}"
             case "liquid":
@@ -108,7 +106,7 @@ def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[s
         # append results
         marker = LIQUID_MARKER.format(id_)
         if mode == "sqlfmt":
-            jinja += f"{liquid[: match.start()]}{marker}{dummy}{marker}"
+            jinja += f"{liquid[: match.start()]}{marker}{dummy}"
         else:
             jinja += f"{liquid[: match.start()]}{dummy}{marker}"
 
@@ -127,18 +125,22 @@ def to_liquid(
 ) -> str:
     if mode == "djhtml":
         return to_liquid_djhtml(jinja, templates, dummies)
+    else:
+        return to_liquid_sqlfmt(jinja, templates, dummies)
 
-    for i, template in enumerate(templates):
-        leading, dummy, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
-        match = DUMMY.match(dummy)
-        if match is None:
-            raise LkmlfmtException()
 
-        if match.group("lead_n") is not None:
-            leading = leading.rstrip("\n ") + "\n"
-            template = match.group("indent") + template
+def to_liquid_sqlfmt(jinja: str, templates: list[str], dummies: list[str]) -> str:
+    for i in range(len(templates)):
+        leading, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
+        space, *_ = trailing.split(dummies[i])
+        if "\n" in space:
+            leading = leading.rstrip("\n ")
+        else:
+            trailing = trailing.lstrip(" ")
 
-        jinja = leading + template + trailing
+        trailing = trailing.replace(dummies[i], templates[i], 1)
+        jinja = leading + trailing
+
     return jinja
 
 
