@@ -80,7 +80,7 @@ class LkmlFormatter:
         key = self.fmt(pair.children[0]).lstrip()
         value = str(pair.children[1])
 
-        if key == "html":
+        if key.startswith("html"):
             with self.indent():
                 indent = self.curr_indent
                 f: Any = (
@@ -105,7 +105,10 @@ class LkmlFormatter:
             Line.prefix = property(  # type: ignore
                 lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
             )
-            value = _fmt_sql(value)
+            if key.startswith("sql"):
+                value = _fmt_sql(value)
+            else:
+                value = _fmt_expr(value)
 
         if "\n" not in value:
             return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
@@ -279,16 +282,26 @@ def _token(token: Token | ParseTree) -> Token:
 def _fmt_html(liquid: str) -> str:
     jinja, templates, dummies = template.to_jinja(liquid, "djhtml")
     jinja = DjHTML(jinja).indent(2)
-    liquid = template.to_liquid(jinja, templates, dummies, "djhtml")
+    liquid = template.to_liquid_djhtml(jinja, templates, dummies)
     return liquid
 
 
 def _fmt_sql(liquid: str) -> str:
-    jinja, templates, dummies = template.to_jinja(liquid)
-    # NOTE let's rely on sqlfmt for not only sql but also looker expression!
+    jinja, templates, dummies = template.to_jinja(liquid, "sqlfmt")
     jinja = api.format_string(jinja, mode=MODE).rstrip()
-    liquid = template.to_liquid(jinja, templates, dummies)
+    liquid = template.to_liquid_sqlfmt(jinja, templates, dummies)
     return liquid
+
+
+def _fmt_expr(liquid: str) -> str:
+    liquid = liquid.replace("case", "lkmlfmt_case")
+    liquid = liquid.replace("when", "lkmlfmt_when")
+    # NOTE let's rely on sqlfmt for not only sql but also looker expression!
+    expr = _fmt_sql(liquid)
+    # TODO and, not, or -> AND, NOT, OR
+    expr = expr.replace("lkmlfmt_case", "case")
+    expr = expr.replace("lkmlfmt_when", "when")
+    return expr
 
 
 def fmt(lkml: str) -> str:

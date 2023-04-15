@@ -396,6 +396,21 @@ sql:
         #     """sql: {{ "foo" | append : "bar" }} ;;""",
         #     """sql: {{ "foo" | append: "bar" }} ;;""",
         # ),
+        # expr
+        (
+            """\
+expression: case(when(yes, "case when yes"), when(no, "case when no"), "else") ;;
+""",
+            """\
+expression:
+  case(
+    when(yes, "case when yes"),
+    when(no, "case when no"),
+    "else"
+  )
+;;
+""",  # `no` seems to be not reserved keyword
+        ),
         # html
         (
             """\

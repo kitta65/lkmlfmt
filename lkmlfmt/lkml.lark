@@ -17,7 +17,7 @@ COMMENT: /#.*/
 // \S is needed cause 0 width regexp is not allowed here
 CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
 // higher priority than IDENT
-CODEBLOCKKEY.1: /expression\w*/ | "html" | /sql\w*/
+CODEBLOCKKEY.1: /expression\w*/ | /html\w*/ | /sql\w*/
 STRING : "\"" /(.|\n)*?/ /(?<!\\)(\\\\)*?/ "\""
 
 %import common.DIGIT

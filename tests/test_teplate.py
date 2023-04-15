@@ -2,7 +2,7 @@ import re
 
 import pytest
 
-from lkmlfmt.template import to_jinja, to_liquid
+from lkmlfmt.template import to_jinja, to_liquid_djhtml, to_liquid_sqlfmt
 from tests import utils
 
 
@@ -167,7 +167,7 @@ select
 def test_to_liquid_sqlfmt(
     jinja: str, liquid: str, templates: list[str], dummies: list[str]
 ) -> None:
-    res = to_liquid(jinja, templates, dummies)
+    res = to_liquid_sqlfmt(jinja, templates, dummies)
     assert res == liquid
 
 
@@ -190,5 +190,5 @@ def test_to_liquid_sqlfmt(
 def test_to_liquid_djhtml(
     jinja: str, liquid: str, templates: list[str], dummies: list[str]
 ) -> None:
-    res = to_liquid(jinja, templates, dummies, "djhtml")
+    res = to_liquid_djhtml(jinja, templates, dummies)
     assert res == liquid
