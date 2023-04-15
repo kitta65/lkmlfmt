@@ -15,6 +15,9 @@ from lkmlfmt.logger import logger
 COMMENT_MARKER = "#LKMLFMT_MARKER#"
 COMMENT = re.compile(rf"{COMMENT_MARKER}")
 BLANK_LINE = re.compile(r"^\s*$")
+ESCAPED_STRING_SINGLE = re.compile(r'"(?P<inner>(.|\n)*?(?<!\\)(\\\\)*?)"')
+ESCAPED_STRING_TRIPLE = re.compile(r'"""(?P<inner>(.|\n)*?(?<!\\)(\\\\)*?)"""')
+NOT_AND_OR = re.compile(r"(?<!\w)(not|and|or)(?!\w)")
 INDENT_WIDTH = 2
 MODE = api.Mode()
 
@@ -293,15 +296,36 @@ def _fmt_sql(liquid: str) -> str:
     return liquid
 
 
+# NOTE let's rely on sqlfmt for not only sql but also looker expression!
 def _fmt_expr(liquid: str) -> str:
-    liquid = liquid.replace("case", "lkmlfmt_case")
-    liquid = liquid.replace("when", "lkmlfmt_when")
-    # NOTE let's rely on sqlfmt for not only sql but also looker expression!
-    expr = _fmt_sql(liquid)
-    # TODO and, not, or -> AND, NOT, OR
-    expr = expr.replace("lkmlfmt_case", "case")
-    expr = expr.replace("lkmlfmt_when", "when")
+    # convert looker expr into sql
+    temp = liquid
+    temp = temp.replace("case", "lkmlfmt_case")
+    temp = temp.replace("when", "lkmlfmt_when")
+    temp = ESCAPED_STRING_SINGLE.sub(r'"""\g<inner>"""', temp)  # " -> """
+
+    temp = _fmt_sql(temp)
+
+    # convert sql into looker expression
+    temp = ESCAPED_STRING_TRIPLE.sub(r'"\g<inner>"', temp)
+    temp = temp.replace("lkmlfmt_when", "when")
+    temp = temp.replace("lkmlfmt_case", "case")
+
+    splited = ESCAPED_STRING_SINGLE.split(temp)
+    expr = ""
+    for i, s in enumerate(splited):
+        match divmod(i, 4)[1]:  # mod
+            case 0:
+                expr += _upper_logical_operator(s)
+            case 1:
+                expr += f'"{s}"'
+
     return expr
+
+
+def _upper_logical_operator(s: str) -> str:
+    uppered = NOT_AND_OR.sub(lambda x: x.group(0).upper(), s)
+    return uppered
 
 
 def fmt(lkml: str) -> str:

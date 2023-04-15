@@ -396,7 +396,7 @@ sql:
         #     """sql: {{ "foo" | append : "bar" }} ;;""",
         #     """sql: {{ "foo" | append: "bar" }} ;;""",
         # ),
-        # expr
+        # expression
         (
             """\
 expression: case(when(yes, "case when yes"), when(no, "case when no"), "else") ;;
@@ -410,6 +410,32 @@ expression:
   )
 ;;
 """,  # `no` seems to be not reserved keyword
+        ),
+        (
+            """\
+expression: "abc
+" = "abc
+";;
+""",
+            """\
+expression:
+  "abc
+" = "abc
+"
+;;
+""",
+        ),
+        (
+            """\
+expression:
+  NOT yes
+  AND "not and or" = ""
+  OR no
+;;
+""",
+            """\
+expression: NOT yes AND "not and or" = "" OR no ;;
+""",
         ),
         # html
         (
