@@ -114,3 +114,9 @@ jobs:
 ## Feedback
 I'm not ready to accept pull requests, but your feedback is always welcome.
 If you find any bugs, please feel free to create an issue.
+
+## See also
+lkmlfmt depends on these awesome formatter and indenter.
+
+* [sqlfmt](https://github.com/tconbeer/sqlfmt)
+* [djhtml](https://github.com/rtts/djhtml)
