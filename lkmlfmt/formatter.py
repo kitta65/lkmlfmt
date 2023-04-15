@@ -316,16 +316,12 @@ def _fmt_expr(liquid: str) -> str:
     for i, s in enumerate(splited):
         match divmod(i, 4)[1]:  # mod
             case 0:
-                expr += _upper_logical_operator(s)
+                uppered = NOT_AND_OR.sub(lambda x: x.group(0).upper(), s)
+                expr += uppered
             case 1:
                 expr += f'"{s}"'
 
     return expr
-
-
-def _upper_logical_operator(s: str) -> str:
-    uppered = NOT_AND_OR.sub(lambda x: x.group(0).upper(), s)
-    return uppered
 
 
 def fmt(lkml: str) -> str:
