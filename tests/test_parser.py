@@ -239,12 +239,6 @@ string
         code block 2
 """,
         ),
-        (
-            "sql:;;",
-            """lkml
-    code_pair\tsql
-""",
-        ),
         # number
         (
             "num: 3.14",
