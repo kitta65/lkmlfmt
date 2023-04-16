@@ -16,7 +16,7 @@ from lkmlfmt.logger import logger
     "--check",
     is_flag=True,
     help="\
-Don't update files.\
+Don't update files. \
 Instead, exit with status code 1 if any file should be modefied.",
 )
 @click.option(
