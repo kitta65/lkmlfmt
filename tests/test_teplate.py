@@ -77,6 +77,11 @@ select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %} 1""",
             "select ${x}",
             "select {% set LKMLFMT_MARKER = 0 %}{{ var }}",
         ),
+        # @{...}
+        (
+            "select @{x}",
+            "select {% set LKMLFMT_MARKER = 0 %}{{ var }}",
+        ),
     ],
     ids=lambda x: re.sub(r"\s+", " ", x),
 )

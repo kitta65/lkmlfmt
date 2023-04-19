@@ -5,7 +5,7 @@ LIQUID_MARKER = "{{% set LKMLFMT_MARKER = {} %}}"
 TEMPLATE = re.compile(
     r"""(?P<tag>\{%-?\s*(?P<type>#|([a-z]*))([^"'}]*|'[^']*?'|"[^"]*?")*?-?%\})"""
     + r"""|(?P<obj>\{\{([^"'}]*|'[^']*?'|"[^"]*?")*?\}\})"""
-    + r"""|(?P<looker>\$\{[^}]*?\})""",
+    + r"""|(?P<looker>(\$|@)\{[^}]*?\})""",
 )
 DUMMY = re.compile(r"^(?P<lead_n> *?\n)?(?P<indent> *)")
 
