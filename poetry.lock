@@ -326,14 +326,14 @@ testing = ["argcomplete", "attrs (>=19.2.0)", "hypothesis (>=3.56)", "mock", "no
 
 [[package]]
 name = "shandy-sqlfmt"
-version = "0.17.1"
+version = "0.18.1"
 description = "sqlfmt is an opinionated CLI tool that formats your sql files"
 category = "main"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "shandy_sqlfmt-0.17.1-py3-none-any.whl", hash = "sha256:e92c4335c8b10e25ac9d97a71aadf5ca0d0ef8650bbe7c1542091b954c5e9c78"},
-    {file = "shandy_sqlfmt-0.17.1.tar.gz", hash = "sha256:f8b6cd72d0a00511da587faf0982f940f8e1cb9fa24070a0405f984d2c400d2d"},
+    {file = "shandy_sqlfmt-0.18.1-py3-none-any.whl", hash = "sha256:afe5c7be494c4e8ecf85e96ea0b96ff81d9879dcf09c2a9e43d8830bb2c0172d"},
+    {file = "shandy_sqlfmt-0.18.1.tar.gz", hash = "sha256:4ccf0dff917adc226e34a6eead5951c38939eda7777549975ed47d6fdd346140"},
 ]
 
 [package.dependencies]
@@ -381,4 +381,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "87d55fe0f7fe9be73e701c6405c535fe21dafae832ed1c291efb866f5d10b420"
+content-hash = "689b3b5d49bf86a48f71a1c86fac36fedb729b383cb38b9d501dfe1f97784bb1"
