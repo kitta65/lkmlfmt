@@ -23,9 +23,9 @@ view: view_name {
   derived_table: {
     sql:
     with cte as (
-      select column_name from tablename
+      select col1, col2 from tablename
       where ts between current_date()-7 and current_date())
-    select column_name from cte
+    select {% if true %} col1 {% elsif %} col2 {% endif %} from cte
     ;;
   }
 }
@@ -37,11 +37,14 @@ view: view_name {
     sql:
       with
         cte as (
-          select column_name
+          select col1, col2
           from tablename
           where ts between current_date() - 7 and current_date()
         )
-      select column_name
+      select
+        {% if true %} col1
+        {% elsif %} col2
+        {% endif %}
       from cte
     ;;
   }
