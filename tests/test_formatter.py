@@ -363,6 +363,9 @@ sql:
   where staff_id = '{{ _user_attributes['staff_id'] }}'
 ;;
 """,
+            # TODO
+            # ${daily.SQL_TABLE_NAME} and ${weekly.SQL_TABLE_NAME} should be indented
+            # latest sqlfmt (>= 0.18.0) do so
             """\
 sql:
   with
@@ -380,7 +383,7 @@ sql:
   from temp
   where staff_id = '{{ _user_attributes['staff_id'] }}'
 ;;
-""",  # {% else %} ${monthly.SQL_TABLE_NAME} is printed in single line by sqlfmt
+""",
         ),
         (
             """\
