@@ -154,7 +154,7 @@ select
     ],
     ids=utils.shorten,
 )
-def test_to_liquid_sqlfmt(
+def test_to_liquid(
     jinja: str, liquid: str, templates: list[str], dummies: list[str]
 ) -> None:
     res = to_liquid(jinja, templates, dummies)
