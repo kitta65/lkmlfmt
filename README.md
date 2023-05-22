@@ -28,14 +28,6 @@ view: view_name {
     select column_name from cte
     ;;
   }
-  dimension: column_name {
-    html:
-{% if value == "foo" %}
-<img src="https://example.com/foo"/>
-{% else %}
-<img src="https://example.com/bar"/>
-{% endif %} ;;
-  }
 }
 """)
 
@@ -116,7 +108,11 @@ I'm not ready to accept pull requests, but your feedback is always welcome.
 If you find any bugs, please feel free to create an issue.
 
 ## See also
-lkmlfmt depends on these awesome formatter and indenter.
+In default, lkmlfmt formats embedded sql using sqlfmt.
 
 * [sqlfmt](https://github.com/tconbeer/sqlfmt)
-* [djhtml](https://github.com/rtts/djhtml)
+
+You can install plugins to change the format of embeded looker expression, sql or html.
+They are distributed under their own licenses, so please check if they are suitable for your purpose.
+
+* [lkmlfmt-djhtml](https://github.com/kitta65/lkmlfmt-djhtml)
