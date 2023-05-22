@@ -337,6 +337,6 @@ def _token(token: Token | ParseTree) -> Token:
     raise LkmlfmtException()
 
 
-def fmt(lkml: str, clickhouse: bool, plugins: list[str]) -> str:
+def fmt(lkml: str, clickhouse: bool = False, plugins: list[str] = []) -> str:
     formatter = LkmlFormatter(lkml, clickhouse, plugins)
     return formatter.fmt()
