@@ -363,6 +363,9 @@ sql:
   where staff_id = '{{ _user_attributes['staff_id'] }}'
 ;;
 """,
+            # TODO
+            # ${daily.SQL_TABLE_NAME} and ${weekly.SQL_TABLE_NAME} should be indented
+            # latest sqlfmt (>= 0.18.0) do so
             """\
 sql:
   with
@@ -380,7 +383,7 @@ sql:
   from temp
   where staff_id = '{{ _user_attributes['staff_id'] }}'
 ;;
-""",  # {% else %} ${monthly.SQL_TABLE_NAME} is printed in single line by sqlfmt
+""",
         ),
         (
             """\
@@ -480,22 +483,22 @@ html:
 dict: {
   html:
     <div>
-      <img src="https://example.com/images/{{ value }}.jpg"/>
-    </div>
+<img src="https://example.com/images/{{ value }}.jpg"/>
+</div>
   ;;
 }
-""",
+""",  # this is not pretty but expected behaviour w/o plugins
         ),
     ],
     ids=utils.shorten,
 )
 def test_formatter_polyglot(input_: str, output: str) -> None:
     # once formatted text matches expected output
-    text1 = fmt(input_, clickhouse=False)
+    text1 = fmt(input_, clickhouse=False, plugins=[])
     assert text1 == output
 
     # twice formatted text also matches expected output
-    text2 = fmt(text1, clickhouse=False)
+    text2 = fmt(text1, clickhouse=False, plugins=[])
     assert text2 == output
 
 
@@ -511,9 +514,9 @@ def test_formatter_polyglot(input_: str, output: str) -> None:
 )
 def test_formatter_clickhouse(input_: str, output: str) -> None:
     # once formatted text matches expected output
-    text1 = fmt(input_, clickhouse=True)
+    text1 = fmt(input_, clickhouse=True, plugins=[])
     assert text1 == output
 
     # twice formatted text also matches expected output
-    text2 = fmt(text1, clickhouse=True)
+    text2 = fmt(text1, clickhouse=True, plugins=[])
     assert text2 == output

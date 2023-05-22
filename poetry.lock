@@ -76,20 +76,6 @@ files = [
 ]
 
 [[package]]
-name = "djhtml"
-version = "3.0.6"
-description = "Django/Jinja template indenter"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "djhtml-3.0.6.tar.gz", hash = "sha256:abfc4d7b4730432ca6a98322fbdf8ae9d6ba254ea57ba3759a10ecb293bc57de"},
-]
-
-[package.extras]
-dev = ["nox", "pre-commit"]
-
-[[package]]
 name = "flake8"
 version = "6.0.0"
 description = "the modular source code checker: pep8 pyflakes and co"
@@ -381,4 +367,4 @@ files = [
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "689b3b5d49bf86a48f71a1c86fac36fedb729b383cb38b9d501dfe1f97784bb1"
+content-hash = "6b7a54222699a3a6f2245a27d41fca7bd0e45523dc7e3514f9d62ce3bd8bb11f"

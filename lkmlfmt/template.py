@@ -1,5 +1,4 @@
 import re
-from typing import Literal
 
 LIQUID_MARKER = "{{% set LKMLFMT_MARKER = {} %}}"
 TEMPLATE = re.compile(
@@ -9,10 +8,8 @@ TEMPLATE = re.compile(
 )
 DUMMY = re.compile(r"^(?P<lead_n> *?\n)?(?P<indent> *)")
 
-MODE = Literal["sqlfmt", "djhtml"]
 
-
-def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[str]]:
+def to_jinja(liquid: str) -> tuple[str, list[str], list[str]]:
     jinja = ""
     templates = []
     dummies = []
@@ -105,10 +102,7 @@ def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[s
 
         # append results
         marker = LIQUID_MARKER.format(id_)
-        if mode == "sqlfmt":
-            jinja += f"{liquid[: match.start()]}{marker}{dummy}"
-        else:
-            jinja += f"{liquid[: match.start()]}{dummy}{marker}"
+        jinja += f"{liquid[: match.start()]}{marker}{dummy}"
 
         templates.append(match.group(0))
         dummies.append(dummy)
@@ -120,7 +114,7 @@ def to_jinja(liquid: str, mode: MODE = "sqlfmt") -> tuple[str, list[str], list[s
     return jinja, templates, dummies
 
 
-def to_liquid_sqlfmt(jinja: str, templates: list[str], dummies: list[str]) -> str:
+def to_liquid(jinja: str, templates: list[str], dummies: list[str]) -> str:
     for i in range(len(templates)):
         leading, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
         space, *_ = trailing.split(dummies[i])
@@ -133,16 +127,3 @@ def to_liquid_sqlfmt(jinja: str, templates: list[str], dummies: list[str]) -> st
         jinja = leading + trailing
 
     return jinja
-
-
-def to_liquid_djhtml(jinja: str, templates: list[str], dummies: list[str]) -> str:
-    liquid = ""
-    trailing = ""
-
-    for i in range(len(templates)):
-        leading, trailing, *_ = jinja.split(f"{dummies[i]}{LIQUID_MARKER.format(i)}")
-        liquid += leading + templates[i]
-        jinja = trailing
-
-    liquid += trailing
-    return liquid

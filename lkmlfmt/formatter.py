@@ -1,9 +1,8 @@
+import importlib
 import re
 from contextlib import contextmanager
-from typing import Any, Generator
+from typing import Generator
 
-from djhtml.lines import Line as DjHTMLLine  # type: ignore
-from djhtml.modes import DjHTML  # type: ignore
 from lark import ParseTree, Token
 from sqlfmt import api
 from sqlfmt.line import Line
@@ -22,7 +21,7 @@ INDENT_WIDTH = 2
 
 
 class LkmlFormatter:
-    def __init__(self, lkml: str, clickhouse: bool) -> None:
+    def __init__(self, lkml: str, clickhouse: bool, plugins: list[str]) -> None:
         self.lkml = lkml
         self.curr_indent = 0
 
@@ -30,6 +29,7 @@ class LkmlFormatter:
         self.tree = tree
         self.comments = comments
         self.mode = api.Mode(dialect_name="clickhouse" if clickhouse else "polyglot")
+        self.plugins = [importlib.import_module(p) for p in plugins]
 
     # NOTE
     # parents take care of self.curr_indent, but children call fmt_indent()
@@ -85,15 +85,11 @@ class LkmlFormatter:
 
         if key.startswith("html"):
             with self.indent():
-                indent = self.curr_indent
-                f: Any = (
-                    lambda s, w: " " * (w * (s.level + indent) + s.offset) + t
-                    if (t := s.text.strip())
-                    else t
-                )
-                # https://github.com/rtts/djhtml/blob/main/djhtml/lines.py
-                DjHTMLLine.indent = f
-                value = _fmt_html(value)
+                formatted = self._try_plugins(value, "fmt_html")
+                if formatted is not None:
+                    value = formatted
+                else:
+                    value = self._fmt_html(value)
 
             if "\n" not in value:
                 return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
@@ -109,9 +105,17 @@ class LkmlFormatter:
                 lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
             )
             if key.startswith("sql"):
-                value = self._fmt_sql(value)
+                formatted = self._try_plugins(value, "fmt_sql")
+                if formatted is not None:
+                    value = formatted
+                else:
+                    value = self._fmt_sql(value)
             else:
-                value = self._fmt_expr(value)
+                formatted = self._try_plugins(value, "fmt_expr")
+                if formatted is not None:
+                    value = formatted
+                else:
+                    value = self._fmt_expr(value)
 
         if "\n" not in value:
             return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
@@ -278,10 +282,14 @@ class LkmlFormatter:
 
         return joined
 
+    def _fmt_html(self, html: str) -> str:
+        html = html.lstrip()
+        return " " * INDENT_WIDTH * self.curr_indent + html
+
     def _fmt_sql(self, liquid: str) -> str:
-        jinja, templates, dummies = template.to_jinja(liquid, "sqlfmt")
+        jinja, templates, dummies = template.to_jinja(liquid)
         jinja = api.format_string(jinja, mode=self.mode).rstrip()
-        liquid = template.to_liquid_sqlfmt(jinja, templates, dummies)
+        liquid = template.to_liquid(jinja, templates, dummies)
         return liquid
 
     # NOTE let's rely on sqlfmt for not only sql but also looker expression!
@@ -311,6 +319,17 @@ class LkmlFormatter:
 
         return expr
 
+    def _try_plugins(self, code: str, func: str) -> str | None:
+        for p in self.plugins:
+            if not hasattr(p, func):
+                continue
+            f = getattr(p, func)
+            s = f(code, self.curr_indent)
+            if not isinstance(s, str):
+                raise LkmlfmtException()
+            return s
+        return None
+
 
 def _token(token: Token | ParseTree) -> Token:
     if isinstance(token, Token):
@@ -318,13 +337,6 @@ def _token(token: Token | ParseTree) -> Token:
     raise LkmlfmtException()
 
 
-def _fmt_html(liquid: str) -> str:
-    jinja, templates, dummies = template.to_jinja(liquid, "djhtml")
-    jinja = DjHTML(jinja).indent(2)
-    liquid = template.to_liquid_djhtml(jinja, templates, dummies)
-    return liquid
-
-
-def fmt(lkml: str, clickhouse: bool) -> str:
-    formatter = LkmlFormatter(lkml, clickhouse)
+def fmt(lkml: str, clickhouse: bool = False, plugins: list[str] = []) -> str:
+    formatter = LkmlFormatter(lkml, clickhouse, plugins)
     return formatter.fmt()

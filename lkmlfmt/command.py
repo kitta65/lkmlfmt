@@ -31,7 +31,17 @@ Instead, exit with status code 1 if any file should be modefied.",
     ),
     default="WARNING",
 )
-def run(file: list[Path], check: bool, clickhouse: bool, log_level: str) -> None:
+@click.option(
+    "--plugin",
+    "plugins",
+    type=str,
+    multiple=True,
+    default=[],
+    help="A plugin to fmt looker expression, sql or html.",
+)
+def run(
+    file: list[Path], check: bool, clickhouse: bool, log_level: str, plugins: list[str]
+) -> None:
     """Format LookML file(s).
 
     FILE is the LookML file(s) to format (directory is also OK).
@@ -45,7 +55,7 @@ def run(file: list[Path], check: bool, clickhouse: bool, log_level: str) -> None
     for f in filter_lkml(file):
         logger.debug(f"formatting {f}")
         before = f.read_text()
-        after = fmt(before, clickhouse)
+        after = fmt(before, clickhouse, plugins)
 
         if before == after:
             click.echo(f"{f} is skipped")
