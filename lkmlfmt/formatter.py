@@ -102,7 +102,9 @@ class LkmlFormatter:
         with self.indent():
             # https://docs.python.org/3/library/functions.html#property
             Line.prefix = property(  # type: ignore
-                lambda s: " " * INDENT_WIDTH * (s.depth[0] + self.curr_indent)
+                lambda s: " "
+                * INDENT_WIDTH
+                * (s.depth[0] + s.depth[1] + self.curr_indent)
             )
             if key.startswith("sql"):
                 formatted = self._try_plugins(value, "fmt_sql")

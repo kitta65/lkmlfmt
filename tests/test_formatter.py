@@ -373,9 +373,9 @@ sql:
       select ts, col1, col2, col3
       from
         {% if ts_date._in_query %}
-        ${daily.SQL_TABLE_NAME}
+          ${daily.SQL_TABLE_NAME}
         {% elsif ts_week._in_query %}
-        ${weekly.SQL_TABLE_NAME}
+          ${weekly.SQL_TABLE_NAME}
         {% else %} ${monthly.SQL_TABLE_NAME}
         {% endif %}
     )
