@@ -280,6 +280,15 @@ arr: [
 ]
 """,
         ),
+        (
+            "sql: select 'longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongstring';; # comment",  # noqa: E501
+            """\
+sql:
+  select
+    'longlonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglonglongstring'
+;; # comment
+""",  # noqa: E501
+        ),
         # sql
         (
             """\
