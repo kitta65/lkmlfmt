@@ -80,8 +80,13 @@ class LkmlFormatter:
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
         lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
+        tcomments = self.fmt_trailing_comments_of(_token(pair.children[0]))
+
         key = self.fmt(pair.children[0]).lstrip()
         value = str(pair.children[1])
+        end = str(pair.children[2]) + self.fmt_trailing_comments_of(
+            _token(pair.children[2])
+        )
 
         if key.startswith("html"):
             with self.indent():
@@ -92,11 +97,14 @@ class LkmlFormatter:
                     value = self._fmt_html(value)
 
             if "\n" not in value:
-                return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
+                return (
+                    f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} {end}"
+                    + tcomments
+                )
 
             return f"""{lcomments}{self.fmt_indent()}{key}:
 {value}
-{self.fmt_indent()};;"""
+{self.fmt_indent()}{end}{tcomments}"""
 
         # sql_xxx: ... ;; or expression_xxx: ... ;;
         with self.indent():
@@ -120,14 +128,17 @@ class LkmlFormatter:
                     value = self._fmt_expr(value)
 
         if "\n" not in value:
-            return f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} ;;"
+            return (
+                f"{lcomments}{self.fmt_indent()}{key}: {value.lstrip()} {end}"
+                + tcomments
+            )
 
         if not value.startswith(" "):  # fallback if sqlfmt does not support
             value = " " * ((self.curr_indent + 1) * INDENT_WIDTH) + value
 
         return f"""{lcomments}{self.fmt_indent()}{key}:
 {value}
-{self.fmt_indent()};;"""
+{self.fmt_indent()}{end}{tcomments}"""
 
     def fmt_dict(self, dict_: ParseTree) -> str:
         with self.indent():
