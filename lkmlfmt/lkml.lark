@@ -1,5 +1,5 @@
 lkml: pair*
-code_pair: CODEBLOCKKEY ":" CODEBLOCK? ";;"
+code_pair: CODEBLOCKKEY ":" CODEBLOCK? CODEBLOCKEND
 value_pair: IDENT ":" value
 ?pair: code_pair | value_pair
 dict: "{" pair* "}"
@@ -16,6 +16,7 @@ IDENT: [/(\+|-)\s*/] CNAME (/\s*\.\s*/ CNAME)* [/\s*?\*/]
 COMMENT: /#.*/
 // \S is needed cause 0 width regexp is not allowed here
 CODEBLOCK: /\S(.|\n)*?(?=\s*;;)/
+CODEBLOCKEND: ";;"
 // higher priority than IDENT
 CODEBLOCKKEY.1: /expression\w*/ | /html\w*/ | /sql\w*/
 STRING : "\"" /(.|\n)*?/ /(?<!\\)(\\\\)*?/ "\""

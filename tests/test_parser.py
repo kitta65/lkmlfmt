@@ -214,6 +214,7 @@ string
     code_pair
         expression
         #this is code block
+        ;;
 """,
         ),
         (
@@ -226,6 +227,7 @@ string
         expression
         multiline
     code block
+        ;;
 """,  # strange indent but OK
         ),
         (
@@ -234,9 +236,11 @@ string
     code_pair
         sql
         code block 1
+        ;;
     code_pair
         sql_xxx
         code block 2
+        ;;
 """,
         ),
         # number
