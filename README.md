@@ -25,7 +25,7 @@ view: view_name {
     with cte as (
       select col1, col2 from tablename
       where ts between current_date()-7 and current_date())
-    select {% if true %} col1 {% elsif %} col2 {% endif %} from cte
+    select {% if true %} col1 {% else %} col2 {% endif %} from cte
     ;;
   }
 }
@@ -43,7 +43,7 @@ view: view_name {
         )
       select
         {% if true %} col1
-        {% elsif %} col2
+        {% else %} col2
         {% endif %}
       from cte
     ;;
