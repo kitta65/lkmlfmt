@@ -72,7 +72,7 @@ class LkmlFormatter:
             values = self.fmt(arr.children, ",")
 
         if "\n" not in values:
-            return f"{self.fmt_indent()}[ {values.lstrip()} ]"
+            return f"{self.fmt_indent()}[{values.lstrip()}]"
 
         return f"""{self.fmt_indent()}[
 {values},

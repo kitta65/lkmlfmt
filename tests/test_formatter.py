@@ -73,7 +73,7 @@ values: []
 values: [ value ]
 """,
             """\
-values: [ value ]
+values: [value]
 """,
         ),
         (
@@ -88,7 +88,7 @@ values: [
     value3,
     value4,
   ],
-  [ value5 ],
+  [value5],
 ]
 """,
         ),
