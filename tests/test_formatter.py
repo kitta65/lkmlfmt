@@ -358,6 +358,14 @@ sql:
         ),
         (
             """\
+sql: select cast({% date_end %} as date) ;;
+""",
+            """\
+sql: select cast({% date_end %} as date) ;;
+""",
+        ),
+        (
+            """\
 sql:
   with temp as (
     select ts, col1, col2, col3
