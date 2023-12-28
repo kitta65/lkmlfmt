@@ -503,6 +503,14 @@ dict: {
 }
 """,  # this is not pretty but expected behaviour w/o plugins
         ),
+        (  # empty code block
+            """\
+expression: ;;
+""",
+            """\
+expression: ;;
+""",
+        ),
     ],
     ids=utils.shorten,
 )

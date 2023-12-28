@@ -209,6 +209,14 @@ string
         ),
         # codeblock
         (
+            "expression: ;;",
+            """lkml
+    code_pair
+        expression
+        ;;
+""",
+        ),
+        (
             "expression: #this is code block ;;",
             """lkml
     code_pair

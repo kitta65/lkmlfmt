@@ -79,6 +79,9 @@ class LkmlFormatter:
 {self.fmt_indent()}]"""
 
     def fmt_code_pair(self, pair: ParseTree) -> str:
+        if len(pair.children) == 2:
+            return self.fmt_code_pair_empty(pair)
+
         lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
         tcomments = self.fmt_trailing_comments_of(_token(pair.children[0]))
 
@@ -150,6 +153,17 @@ class LkmlFormatter:
         return f"""{self.fmt_indent()}{{
 {pairs}
 {self.fmt_indent()}}}"""
+
+    def fmt_code_pair_empty(self, pair: ParseTree) -> str:
+        lcomments = self.fmt_leading_comments_of(_token(pair.children[0]))
+        tcomments = self.fmt_trailing_comments_of(_token(pair.children[0]))
+
+        key = self.fmt(pair.children[0]).lstrip()
+        end = str(pair.children[1]) + self.fmt_trailing_comments_of(
+            _token(pair.children[1])
+        )
+
+        return f"{lcomments}{self.fmt_indent()}{key}: {end}{tcomments}"
 
     def fmt_lkml(self, lookml: ParseTree) -> str:
         stmts = [child for child in lookml.children]
