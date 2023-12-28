@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "lkmlfmt"
-version = "0.0.13"
+version = "0.0.14"
 description = ""
 authors = ["dr666m1 <skndr666m1@gmail.com>"]
 readme = "README.md"
