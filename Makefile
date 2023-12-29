@@ -14,4 +14,4 @@ fmt:
 .PHONY: publish
 publish:
 	poetry build
-	poetry publish --password ${PYPI_PASSWORD} --username dr666m1
+	poetry publish --password ${PYPI_PASSWORD} --username __token__
