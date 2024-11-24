@@ -86,8 +86,9 @@ select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %} 1""",
     ids=lambda x: re.sub(r"\s+", " ", x),
 )
 def test_to_jinja_sqlfmt(liquid: str, jinja: str) -> None:
-    res, *_ = to_jinja(liquid)
+    res, templates, dummies = to_jinja(liquid)
     assert res == jinja
+    assert len(templates) == len(dummies)
 
 
 @pytest.mark.parametrize(
