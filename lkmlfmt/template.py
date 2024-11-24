@@ -25,7 +25,6 @@ def to_jinja(liquid: str) -> tuple[str, list[str], list[str]]:
         type_ = match.group("type")
         if skip_to is not None and skip_to != type_:
             jinja += liquid[: match.end()]
-            templates.append(match.group(0))
             liquid = liquid[match.end() :]
             continue
 
