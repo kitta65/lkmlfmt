@@ -51,6 +51,22 @@ select {%
             """\
 select {% set LKMLFMT_MARKER = 0 %}{% set x = 'x' %}""",
         ),
+        (
+            """\
+select {{
+  var
+}}""",
+            """\
+select {% set LKMLFMT_MARKER = 0 %}{{ var }}""",
+        ),
+        (
+            """\
+select ${
+  var
+}""",
+            """\
+select {% set LKMLFMT_MARKER = 0 %}{{ var }}""",
+        ),
         # comment
         (
             "select {% # comment %} 1",
@@ -147,6 +163,25 @@ select {% set LKMLFMT_MARKER = 0 %}
 select
   {{ A }},
   {{ B }},
+""",
+            ["{{ A }}", "{{ B }}"],
+            ["{{ a }}", "{{ b }}"],
+        ),
+        (
+            """\
+select
+  {%
+    set LKMLFMT_MARKER = 0
+  %}
+  {{
+    a
+  }},
+  {% set
+    LKMLFMT_MARKER = 1
+  %} {{ b }},
+""",
+            """\
+select {{ A }}
 """,
             ["{{ A }}", "{{ B }}"],
             ["{{ a }}", "{{ b }}"],

@@ -116,8 +116,8 @@ def to_jinja(liquid: str) -> tuple[str, list[str], list[str]]:
 
 def to_liquid(jinja: str, templates: list[str], dummies: list[str]) -> str:
     for i in range(len(templates)):
-        leading, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))
-        space, *_ = trailing.split(dummies[i])
+        leading, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))  # TODO use regex
+        space, *_ = trailing.split(dummies[i])  # TODO use regex
         if "\n" in space:
             leading = leading.rstrip("\n ")
         else:
