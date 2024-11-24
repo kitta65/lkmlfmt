@@ -116,14 +116,20 @@ def to_jinja(liquid: str) -> tuple[str, list[str], list[str]]:
 
 def to_liquid(jinja: str, templates: list[str], dummies: list[str]) -> str:
     for i in range(len(templates)):
-        leading, trailing, *_ = jinja.split(LIQUID_MARKER.format(i))  # TODO use regex
-        space, *_ = trailing.split(dummies[i])  # TODO use regex
+        marker = LIQUID_MARKER.format(i)
+        marker = marker.replace(" ", r"\s*")
+        leading, trailing, *_ = re.split(marker, jinja, 1)
+
+        dummy = dummies[i]
+        dummy = dummy.replace(" ", r"\s*")
+        space, *_ = re.split(dummy, trailing, 1)
+
         if "\n" in space:
             leading = leading.rstrip("\n ")
         else:
             trailing = trailing.lstrip(" ")
 
-        trailing = trailing.replace(dummies[i], templates[i], 1)
+        trailing = re.sub(dummy, templates[i], trailing, 1)
         jinja = leading + trailing
 
     return jinja
